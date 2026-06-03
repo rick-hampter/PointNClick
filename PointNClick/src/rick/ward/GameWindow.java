@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -17,6 +18,11 @@ import java.util.Random;
 
 public class GameWindow extends JFrame {
 
+	
+	public static double GameVersion = 0.1;
+	
+	
+	
 	// =================
 	// FROM GOOGLE
 	// =================
@@ -38,7 +44,79 @@ public class GameWindow extends JFrame {
 
 		return dest;
 	}
+	
+	
 
+
+
+	private Clip rain;
+	public void rainAmbience(File file) {
+        // If something is already playing, stop it first
+        stop();
+
+        // Run in a background thread to keep your GUI responsive
+        new Thread(() -> {
+            try {
+                AudioInputStream inputStream = AudioSystem.getAudioInputStream(file);
+                
+                // Synchronized ensures stop() and play() don't collide
+                synchronized (this) {
+                    rain = AudioSystem.getClip();
+                    rain.open(inputStream);
+                }
+
+                    // This tells Java to loop the clip indefinitely at the hardware/driver level
+                    rain.loop(Clip.LOOP_CONTINUOUSLY);
+
+                // Clean up memory when done
+                rain.addLineListener(event -> {
+                    if (event.getType() == LineEvent.Type.STOP) {
+                        synchronized (this) {
+                            if (rain != null) {
+                            	rain.close();
+                            }
+                        }
+                    }
+                });
+
+            } catch (Exception e) {
+                System.err.println("Playback error: " + e.getMessage());
+            }
+        }).start();
+    }
+	public synchronized void setRainVolume(float volume) {
+        if (rain == null) return;
+
+        // Ensure the volume bounds stay between 0.0 and 1.0
+        volume = Math.max(0.0f, Math.min(1.0f, volume));
+
+        try {
+            // Get the Master Gain control (controls decibels)
+            FloatControl gainControl = (FloatControl) rain.getControl(FloatControl.Type.MASTER_GAIN);
+            
+            // Logarithmic volume scaling (linear percentages don't sound right to human ears)
+            float dB = (float) (Math.log10(volume) * 20.0);
+            
+            // Handle absolute silence safely
+            if (volume == 0.0f) {
+                dB = gainControl.getMinimum(); 
+            }
+
+            gainControl.setValue(dB);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Volume control not supported by this audio format.");
+        }
+    }
+
+    /**
+     * Stops the currently playing WAV file immediately.
+     */
+    public synchronized void stop() {
+        if (rain != null && rain.isRunning()) {
+        	rain.stop();
+        	rain.close();
+        }
+    }
 	// =================
 	// UNTIL THIS POINT
 	// =================
@@ -128,8 +206,8 @@ public class GameWindow extends JFrame {
 	// -------------------------------------------------------------------------
 	// Config
 	// -------------------------------------------------------------------------
-	private static final int WIDTH = 800;
-	private static final int HEIGHT = 600;
+	public static final int WIDTH = 800;
+	public static final int HEIGHT = 600;
 	private static final int TARGET_FPS = 60;
 
 	// -------------------------------------------------------------------------
@@ -303,7 +381,7 @@ public class GameWindow extends JFrame {
 		String gameName = Titles[TitlesRand] + " " + ProperNouns[ProperNounsRand] + " and " + Nouns[NounsRand] + " "
 				+ Catches[CatchesRand];
 		setTitle(gameName);
-		playWav(rainAMB);
+		rainAmbience(rainAMB);
 		bgImage = ImageIO.read(new File("ui_scale4.png"));
 		uiButton0 = ImageIO.read(new File("button_scale4_0.png"));
 		uiButton1 = ImageIO.read(new File("button_scale4_1.png"));
@@ -375,7 +453,7 @@ public class GameWindow extends JFrame {
 		if (metroGnome == 1) {
 			TimerAsOfLastClick = -10;
 			TimerAsOfEffect = -10;
-			TimerAsOfAmbience = 50;
+
 		}
 
 		// rock logic
@@ -411,7 +489,8 @@ public class GameWindow extends JFrame {
 
 		if (currentScene.equals("outside") && (TimerAsOfLastClick + 3) < metroGnome && mouseX > 208 && mouseY > 432
 				&& mouseX < 260 && mouseY < 490 && mouseDown && rockIsSearched && !frontDoorKeyCollected) {
-			playWav(collectSFX);
+			playWav(omenSFX);
+
 			TimerAsOfLastClick = metroGnome;
 			anyDoorKeyIsBeingHeld = true;
 			frontDoorKeyCollected = true;
@@ -464,7 +543,7 @@ public class GameWindow extends JFrame {
 		if (mouseDown && mouseX > 460 && mouseY > 270 && mouseX < 500 && mouseY < 310 && currentScene.equals("outside")
 				&& (TimerAsOfLastClick + 1) < metroGnome && frontDoorOpen) {
 			TimerAsOfLastClick = metroGnome;
-
+			setRainVolume(0.5f);
 			currentScene = "hallway";
 			playWav(omenSFX);
 			tooltip = "It's the hallway.";
@@ -499,10 +578,7 @@ public class GameWindow extends JFrame {
 			tooltip = "It's an ugly room.";
 		}
 
-		if (metroGnome == 110 && (TimerAsOfAmbience < metroGnome)) {
-			playWav(rainAMB);
-			TimerAsOfAmbience = metroGnome + 50;
-		}
+
 		if ((metroGnome % 28) == 5 && LatestRNG > 0.5 && thundered == false) {
 			playWav(thunderSFX);
 			TimerAsOfEffect = metroGnome + 3;
@@ -546,6 +622,7 @@ public class GameWindow extends JFrame {
 			} else if (currentScene.equals("atrium")) {
 				g.drawImage(goto_0, 157, 353, -64, 64, null);
 			}
+		
 			break;
 		// 208432
 		case "hallway":
