@@ -167,10 +167,10 @@ public class GameWindow extends JFrame {
 	private int GameTimerWhenButtonsAppear = 5;
 	private boolean DrawTheButtons = false;
 
-	private int GameTimerWhenPreambleAppears = 7;
+	private int GameTimerWhenPreambleAppears = 9;
 	private boolean DrawThePreamble = false;
 
-	private int GameTimerWhenSignatureAppears = 9;
+	private int GameTimerWhenSignatureAppears = 12;
 	private boolean DrawTheSignature = false;
 
 	private boolean pinCollected = false;
@@ -270,10 +270,10 @@ public class GameWindow extends JFrame {
 	private static boolean cinematicDelayOver = false;
 	
 	private void leaveMenu() {
-		if (metroGnome > 195) {
-			cinematicDelay = metroGnome - 195;
+		if (metroGnome > 190) {
+			cinematicDelay = metroGnome - 190;
 		} else {
-			cinematicDelay = metroGnome + 5;
+			cinematicDelay = metroGnome + 10;
 		}
 		currentScene = "blank";
 		cursorType = "clicker";
@@ -282,26 +282,21 @@ public class GameWindow extends JFrame {
 		playWav(omenSFX);
 	}
 
-	// -------------------------------------------------------------------------
-	// Config
-	// -------------------------------------------------------------------------
+
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;
 	private static final int TARGET_FPS = 60;
 
-	// -------------------------------------------------------------------------
-	// State
-	// -------------------------------------------------------------------------
+
 	private int mouseX = 0;
 	private int mouseY = 0;
 
-	// -------------------------------------------------------------------------
-	// Canvas (all drawing happens here)
-	// -------------------------------------------------------------------------
+
 	private final Canvas canvas = new Canvas() {
 		@Override
 		public void paint(Graphics g) {
-			/* handled by active rendering */ }
+			
+		}
 	};
 
 	public GameWindow() {
@@ -335,7 +330,7 @@ public class GameWindow extends JFrame {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// fired when key is let go
+				// fired when key is let go (duh)
 			}
 		});
 		setTitle(gameName);
@@ -355,29 +350,23 @@ public class GameWindow extends JFrame {
 		});
 
 		canvas.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		canvas.setIgnoreRepaint(true); // we drive all repaints ourselves
+		canvas.setIgnoreRepaint(true);
 		add(canvas);
 		pack();
 		setLocationRelativeTo(null);
 
-		// ── Hide the real cursor ──────────────────────────────────────────────
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		BufferedImage blank = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 		Cursor hiddenCursor = tk.createCustomCursor(blank, new Point(0, 0), "hidden");
 		canvas.setCursor(hiddenCursor);
 
-		// ── Track mouse position ──────────────────────────────────────────────
-//        canvas.addMouseMotionListener(new MouseMotionAdapter() {
-//            @Override public void mouseMoved  (MouseEvent e) { mouseX = e.getX(); mouseY = e.getY(); }
-//            @Override public void mouseDragged(MouseEvent e) { mouseX = e.getX(); mouseY = e.getY(); }
-//        });
+
 	}
 
 	// =========================================================================
 	// MAIN LOOP
 	// =========================================================================
 	public static void playWav(File file) {
-		// Run this in a background thread to prevent GUI/Logic lag
 		new Thread(() -> {
 			try {
 				AudioInputStream inputStream = AudioSystem.getAudioInputStream(file);
@@ -385,7 +374,6 @@ public class GameWindow extends JFrame {
 				clip.open(inputStream);
 				clip.start();
 
-				// Optional: Clean up memory once the sound finishes
 				clip.addLineListener(event -> {
 					if (event.getType() == LineEvent.Type.STOP) {
 						clip.close();
@@ -400,33 +388,30 @@ public class GameWindow extends JFrame {
 
 	private void run() throws IOException, LineUnavailableException, UnsupportedAudioFileException {
 		setVisible(true);
-		canvas.createBufferStrategy(2); // double-buffer
+		canvas.createBufferStrategy(2); 
 
 		final long nsPerFrame = 1_000_000_000L / TARGET_FPS;
 
-		// ── Put any one-time setup here ───────────────────────────────────────
+		
 		setup();
 
 		while (true) {
 			long frameStart = System.nanoTime();
 
-			// ── Update ────────────────────────────────────────────────────────
 
 			update();
 
-			// ── Render ───────────────────────────────────────────────────────
 			do {
 				Graphics2D g = (Graphics2D) canvas.getBufferStrategy().getDrawGraphics();
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-				draw(g); // ← your drawing code lives here
-				drawCursor(g); // always drawn last so it's on top
+				draw(g); 
+				drawCursor(g);
 
 				g.dispose();
 			} while (canvas.getBufferStrategy().contentsRestored());
 			canvas.getBufferStrategy().show();
 
-			// ── Cap frame rate ────────────────────────────────────────────────
 			long elapsed = System.nanoTime() - frameStart;
 			long sleepNs = nsPerFrame - elapsed;
 			if (sleepNs > 0) {
@@ -438,15 +423,7 @@ public class GameWindow extends JFrame {
 		}
 	}
 
-	// =========================================================================
-	// OVERRIDE THESE THREE METHODS
-	// =========================================================================
 
-	/**
-	 * Called once before the loop starts. Load assets, initialise state, etc.
-	 * 
-	 * @throws IOException
-	 */
 	private void setup() throws IOException {
 		String[] Titles = { "Proffesor", "Doctor", "Inspector", "Detective", "Mr.", "Grand Inquisitor", "Dr.", "Sir",
 				"Lord" };
@@ -510,17 +487,11 @@ public class GameWindow extends JFrame {
 		goto_0 = ImageIO.read(new File("go_to_0_x16.png"));
 		goto_1 = ImageIO.read(new File("go_to_1_x16.png"));
 		pin = ImageIO.read(new File("collectable_room2_pin.png"));
-		// TODO: your setup code
 	}
 
-	/**
-	 * Called every frame before drawing. Move things, update physics, etc.
-	 * 
-	 * @throws UnsupportedAudioFileException
-	 * @throws LineUnavailableException
-	 */
-	private boolean thundered = false;
 
+	private boolean thundered = false;
+	private int SpecialDoorbellDelay = 0;
 	private void update() throws LineUnavailableException, UnsupportedAudioFileException {
 		LatestRNG = Math.random();
 
@@ -529,6 +500,7 @@ public class GameWindow extends JFrame {
 		SwingUtilities.convertPointFromScreen(p, canvas);
 		mouseX = p.x;
 		mouseY = p.y;
+
 
 		// MENU GNOME!!!!!!!!!
 		if (inMenu) {
@@ -566,7 +538,7 @@ public class GameWindow extends JFrame {
 					rainStarted = true;
 				}
 			}
-			// TODO: your update/logic code
+			
 			if (mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580 && MagnifyingGlassActive
 					&& (TimerAsOfLastClick + 1) < metroGnome && !anyDoorKeyIsBeingHeld) {
 				MagnifyingGlassActive = false;
@@ -583,9 +555,10 @@ public class GameWindow extends JFrame {
 			}
 			// 320200
 
-			if (metroGnome == 1) {
-				TimerAsOfLastClick = -10;
-				TimerAsOfEffect = -10;
+			if (metroGnome > 190) {
+				TimerAsOfLastClick = metroGnome - 190;
+				TimerAsOfEffect = metroGnome - 190;
+				SpecialDoorbellDelay = metroGnome - 190;
 
 			}
 
@@ -634,10 +607,12 @@ public class GameWindow extends JFrame {
 
 			// doorbell ringin' logic
 
-			if (currentScene.equals("outside") && (TimerAsOfLastClick + 10) < metroGnome && mouseX > 320 && mouseY > 200
+			if (currentScene.equals("outside") && (SpecialDoorbellDelay + 10) < metroGnome && mouseX > 320 && mouseY > 200
 					&& mouseX < 360 && mouseY < 300 && mouseDown) {
+				System.out.println("hi");
+				SpecialDoorbellDelay = metroGnome;
 				playWav(doorbellSFX);
-				TimerAsOfLastClick = metroGnome;
+
 				tooltip = "The doorbell serves no purpose";
 				doorBellIsPressed = true;
 			}
@@ -734,10 +709,7 @@ public class GameWindow extends JFrame {
 		}
 	}
 
-	/**
-	 * Called every frame. Draw everything here. The cursor is drawn automatically
-	 * on top.
-	 */
+
 	private void draw(Graphics2D g) {
 		g.setFont(TimesNewHamster);
 		g.setColor(Color.BLACK);
@@ -787,7 +759,7 @@ public class GameWindow extends JFrame {
 			}
 
 			break;
-		// 208432
+
 		case "hallway":
 			g.drawImage(room4, 0, 0, WIDTH, HEIGHT, null);
 			break;
@@ -820,11 +792,10 @@ public class GameWindow extends JFrame {
 			break;
 		}
 
-		if (doorBellIsPressed) {
+		if (doorBellIsPressed && currentScene.equals("outside")) {
 			g.drawImage(overlay_doorbell, 0, 0, WIDTH, HEIGHT, null);
 		}
-		// 93 353
-		// ── TODO: your drawing code ───────────────────────────────────────────
+
 		g.setColor(Color.WHITE);
 		if (debugMode) {
 			g.setColor(Color.MAGENTA);
@@ -894,27 +865,11 @@ public class GameWindow extends JFrame {
 			}
 		}
 	}
-// 617 324
-	// =========================================================================
-	// CURSOR — edit drawCursor() to swap the red dot for an image
-	// =========================================================================
 
-	/**
-	 * Draws the custom cursor at the current mouse position.
-	 *
-	 * TO USE AN IMAGE INSTEAD OF THE RED DOT: 1. Load it once in setup():
-	 * cursorImage = ImageIO.read(new File("cursor.png")); 2. In drawCursor(),
-	 * replace the fillOval block with: g.drawImage(cursorImage, mouseX - hotspotX,
-	 * mouseY - hotspotY, null); where hotspotX/hotspotY are the pixel within the
-	 * image that acts as the tip.
-	 */
+
 	private void drawCursor(Graphics2D g) {
 
-		// ── Option A: red dot (default) ───────────────────────────────────────
-//        int r = 8;
-//        g.setColor(Color.RED);
-//        g.fillOval(mouseX - r, mouseY - r, r * 2, r * 2);
-		int hotspotX = 0, hotspotY = 0; // which pixel in the image is the tip
+
 		if (cursorType.equals("clicker")) {
 			if (foundSomething) {
 				g.drawImage(cursor1, mouseX - hotspotX, mouseY - hotspotY, 64, 64, null);
@@ -941,12 +896,6 @@ public class GameWindow extends JFrame {
 
 	}
 
-	// ── Uncomment this field when you switch to an image cursor ──────────────
-	// private java.awt.image.BufferedImage cursorImage;
-
-	// =========================================================================
-	// ENTRY POINT
-	// =========================================================================
 	public static void main(String[] args) {
 
 		Timer metronome = new Timer(500, e -> {
@@ -962,15 +911,15 @@ public class GameWindow extends JFrame {
 					try {
 						gw.run();
 					} catch (LineUnavailableException e1) {
-						// TODO Auto-generated catch block
+
 						e1.printStackTrace();
 					} catch (UnsupportedAudioFileException e1) {
-						// TODO Auto-generated catch block
+
 						e1.printStackTrace();
 					}
 				} catch (IOException e) {
 					System.out.println("oops");
-					// TODO Auto-generated catch block
+
 					e.printStackTrace();
 				}
 			}).start();
