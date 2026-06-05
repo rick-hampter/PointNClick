@@ -282,7 +282,9 @@ public class GameWindow extends JFrame {
 		playWav(omenSFX);
 	}
 
-
+	// -------------------------------------------------------------------------
+	// Config
+	// -------------------------------------------------------------------------
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;
 	private static final int TARGET_FPS = 60;
@@ -869,7 +871,9 @@ public class GameWindow extends JFrame {
 
 	private void drawCursor(Graphics2D g) {
 
+		int hotspotX = 0;
 
+		int hotspotY = 0;
 		if (cursorType.equals("clicker")) {
 			if (foundSomething) {
 				g.drawImage(cursor1, mouseX - hotspotX, mouseY - hotspotY, 64, 64, null);
