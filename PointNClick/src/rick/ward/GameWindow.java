@@ -211,7 +211,7 @@ public class GameWindow extends JFrame {
 	private static int metroGnome = 0;
 
 	private static String currentScene = "menu";
-	
+
 	private static boolean rainStarted = false;
 
 	private boolean MagnifyingGlassActive = false;
@@ -268,7 +268,7 @@ public class GameWindow extends JFrame {
 
 	private static int cinematicDelay = 999;
 	private static boolean cinematicDelayOver = false;
-	
+
 	private void leaveMenu() {
 		if (metroGnome > 190) {
 			cinematicDelay = metroGnome - 190;
@@ -289,15 +289,13 @@ public class GameWindow extends JFrame {
 	public static final int HEIGHT = 600;
 	private static final int TARGET_FPS = 60;
 
-
 	private int mouseX = 0;
 	private int mouseY = 0;
-
 
 	private final Canvas canvas = new Canvas() {
 		@Override
 		public void paint(Graphics g) {
-			
+
 		}
 	};
 
@@ -308,16 +306,16 @@ public class GameWindow extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				int key = e.getKeyCode();
-				if (key == KeyEvent.VK_1) {
-					currentScene = "darkroom";
-				} else if (key == KeyEvent.VK_2) {
-					currentScene = "lightroom";
+				if (key == KeyEvent.VK_2) {
+					currentScene = "Painting Room";
+				} else if (key == KeyEvent.VK_1) {
+					currentScene = "A dark void";
 				} else if (key == KeyEvent.VK_3) {
-					currentScene = "atrium";
+					currentScene = "Atrium";
 				} else if (key == KeyEvent.VK_4) {
-					currentScene = "hallway";
+					currentScene = "Main Hall";
 				} else if (key == KeyEvent.VK_5) {
-					currentScene = "outside";
+					currentScene = "Courtyard";
 				} else if (key == KeyEvent.VK_M) {
 					currentScene = "menu";
 					inMenu = true;
@@ -362,7 +360,6 @@ public class GameWindow extends JFrame {
 		Cursor hiddenCursor = tk.createCustomCursor(blank, new Point(0, 0), "hidden");
 		canvas.setCursor(hiddenCursor);
 
-
 	}
 
 	// =========================================================================
@@ -390,16 +387,14 @@ public class GameWindow extends JFrame {
 
 	private void run() throws IOException, LineUnavailableException, UnsupportedAudioFileException {
 		setVisible(true);
-		canvas.createBufferStrategy(2); 
+		canvas.createBufferStrategy(2);
 
 		final long nsPerFrame = 1_000_000_000L / TARGET_FPS;
 
-		
 		setup();
 
 		while (true) {
 			long frameStart = System.nanoTime();
-
 
 			update();
 
@@ -407,7 +402,7 @@ public class GameWindow extends JFrame {
 				Graphics2D g = (Graphics2D) canvas.getBufferStrategy().getDrawGraphics();
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-				draw(g); 
+				draw(g);
 				drawCursor(g);
 
 				g.dispose();
@@ -424,7 +419,6 @@ public class GameWindow extends JFrame {
 			}
 		}
 	}
-
 
 	private void setup() throws IOException {
 		String[] Titles = { "Proffesor", "Doctor", "Inspector", "Detective", "Mr.", "Grand Inquisitor", "Dr.", "Sir",
@@ -491,9 +485,9 @@ public class GameWindow extends JFrame {
 		pin = ImageIO.read(new File("collectable_room2_pin.png"));
 	}
 
-
 	private boolean thundered = false;
 	private int SpecialDoorbellDelay = 0;
+
 	private void update() throws LineUnavailableException, UnsupportedAudioFileException {
 		LatestRNG = Math.random();
 
@@ -502,7 +496,6 @@ public class GameWindow extends JFrame {
 		SwingUtilities.convertPointFromScreen(p, canvas);
 		mouseX = p.x;
 		mouseY = p.y;
-
 
 		// MENU GNOME!!!!!!!!!
 		if (inMenu) {
@@ -534,13 +527,13 @@ public class GameWindow extends JFrame {
 
 			if (metroGnome > cinematicDelay && !cinematicDelayOver) {
 				cinematicDelayOver = true;
-				currentScene = "outside";
+				currentScene = "Courtyard";
 				if (!rainStarted) {
 					rainAmbience(rainAMB);
 					rainStarted = true;
 				}
 			}
-			
+
 			if (mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580 && MagnifyingGlassActive
 					&& (TimerAsOfLastClick + 1) < metroGnome && !anyDoorKeyIsBeingHeld) {
 				MagnifyingGlassActive = false;
@@ -566,8 +559,8 @@ public class GameWindow extends JFrame {
 
 			// rock logic
 
-			if (currentScene.equals("outside") && (TimerAsOfLastClick + 2) < metroGnome && mouseX > 164 && mouseY > 416
-					&& mouseX < 294 && mouseY < 445 && mouseDown && !rockIsSearched) {
+			if (currentScene.equals("Courtyard") && (TimerAsOfLastClick + 2) < metroGnome && mouseX > 164
+					&& mouseY > 416 && mouseX < 294 && mouseY < 445 && mouseDown && !rockIsSearched) {
 				playWav(rockSFX);
 				rockIsSearched = true;
 				TimerAsOfLastClick = metroGnome;
@@ -576,12 +569,13 @@ public class GameWindow extends JFrame {
 
 			// door logic
 
-			if (currentScene.equals("outside") && (TimerAsOfLastClick + 2) < metroGnome && mouseX > 381 && mouseY > 106
-					&& mouseX < 586 && mouseY < 310 && mouseDown && !frontDoorOpen && !anyDoorKeyIsBeingHeld) {
+			if (currentScene.equals("Courtyard") && (TimerAsOfLastClick + 2) < metroGnome && mouseX > 381
+					&& mouseY > 106 && mouseX < 586 && mouseY < 310 && mouseDown && !frontDoorOpen
+					&& !anyDoorKeyIsBeingHeld) {
 				playWav(knockSFX);
 				TimerAsOfLastClick = metroGnome;
 				tooltip = "No answer.";
-			} else if (currentScene.equals("outside") && (TimerAsOfLastClick + 2) < metroGnome && mouseX > 381
+			} else if (currentScene.equals("Courtyard") && (TimerAsOfLastClick + 2) < metroGnome && mouseX > 381
 					&& mouseY > 106 && mouseX < 586 && mouseY < 310 && mouseDown && !frontDoorOpen
 					&& anyDoorKeyIsBeingHeld) {
 				TimerAsOfLastClick = metroGnome;
@@ -595,9 +589,9 @@ public class GameWindow extends JFrame {
 
 			// pick up key logic!!!
 
-			if (currentScene.equals("outside") && (TimerAsOfLastClick + 3) < metroGnome && mouseX > 208 && mouseY > 432
-					&& mouseX < 260 && mouseY < 490 && mouseDown && rockIsSearched && !frontDoorKeyCollected) {
-
+			if (currentScene.equals("Courtyard") && (TimerAsOfLastClick + 3) < metroGnome && mouseX > 208
+					&& mouseY > 432 && mouseX < 260 && mouseY < 490 && mouseDown && rockIsSearched
+					&& !frontDoorKeyCollected) {
 
 				TimerAsOfLastClick = metroGnome;
 				anyDoorKeyIsBeingHeld = true;
@@ -609,8 +603,8 @@ public class GameWindow extends JFrame {
 
 			// doorbell ringin' logic
 
-			if (currentScene.equals("outside") && (SpecialDoorbellDelay + 10) < metroGnome && mouseX > 320 && mouseY > 200
-					&& mouseX < 360 && mouseY < 300 && mouseDown) {
+			if (currentScene.equals("Courtyard") && (SpecialDoorbellDelay + 10) < metroGnome && mouseX > 320
+					&& mouseY > 200 && mouseX < 360 && mouseY < 300 && mouseDown) {
 				System.out.println("hi");
 				SpecialDoorbellDelay = metroGnome;
 				playWav(doorbellSFX);
@@ -618,45 +612,55 @@ public class GameWindow extends JFrame {
 				tooltip = "The doorbell serves no purpose";
 				doorBellIsPressed = true;
 			}
-			if (TimerAsOfLastClick + 10 == metroGnome) {
+			if (SpecialDoorbellDelay + 10 == metroGnome) {
 				doorBellIsPressed = false;
 			}
 
 			// the light switch in the painting room
 			if (mouseDown && mouseX > 70 && mouseY > 310 && mouseX < 104 && mouseY < 380
-					&& currentScene.equals("darkroom") && (TimerAsOfLastClick + 10) < metroGnome) {
-				currentScene = "lightroom";
+					&& currentScene.equals("A dark void") && (TimerAsOfLastClick + 10) < metroGnome) {
+				currentScene = "Painting Room";
 				playWav(clickSFX);
 				areTheLightsOnInThePaintingRoom = true;
 				tooltip = "It's an ugly room.";
 			}
 
 			// go-to arrows on the logic side
-
+ 
+			if(mouseDown && mouseX > 720 && mouseY > 228 && mouseX < 780 && mouseY < 254 && currentScene.equals("Main Hall")) {
+				currentScene = "Foyer";
+				playWav(doorSFX);
+				playWav(footstepsSFX);
+				tooltip = "It's the Foyer.";
+			}
+			
+			
 			if (mouseDown && mouseX > 94 && mouseY > 367 && mouseX < 154 && mouseY < 406
-					&& currentScene.equals("atrium") && (TimerAsOfLastClick + 2) < metroGnome) {
+					&& currentScene.equals("Atrium") && (TimerAsOfLastClick + 2) < metroGnome) {
 				TimerAsOfLastClick = metroGnome;
 				if (areTheLightsOnInThePaintingRoom) {
-					currentScene = "lightroom";
+					currentScene = "Painting Room";
 					playWav(doorSFX);
+					playWav(footstepsSFX);
 					tooltip = "It's an ugly room.";
 
 				} else {
 					TimerAsOfLastClick = metroGnome;
-					currentScene = "darkroom";
+					currentScene = "A dark void";
 					playWav(doorSFX);
+					playWav(footstepsSFX);
 					tooltip = "It's a dark room.";
 				}
 
 			}
 
 			if (mouseDown && mouseX > 460 && mouseY > 270 && mouseX < 500 && mouseY < 310
-					&& currentScene.equals("outside") && (TimerAsOfLastClick + 2) < metroGnome && frontDoorOpen) {
+					&& currentScene.equals("Courtyard") && (TimerAsOfLastClick + 2) < metroGnome && frontDoorOpen) {
 				TimerAsOfLastClick = metroGnome;
 				setRainVolume(0.5f);
-				currentScene = "hallway";
+				currentScene = "Main Hall";
 				playWav(omenSFX);
-				tooltip = "It's the hallway.";
+				tooltip = "It's a hallway.";
 
 			}
 
@@ -665,26 +669,34 @@ public class GameWindow extends JFrame {
 			// draw method.
 
 			if (mouseX > 617 && mouseY > 324 && mouseX < 670 && mouseY < 380 & mouseDown
-					&& (TimerAsOfLastClick + 2) < metroGnome) {
-				currentScene = "atrium";
+					&& (TimerAsOfLastClick + 2) < metroGnome && currentScene.equals("A dark void") || currentScene.equals("Painting Room")) {
+				currentScene = "Atrium";
 				TimerAsOfLastClick = metroGnome;
 				playWav(doorSFX);
 			}
+			
+			if (mouseX > 676 && mouseY > 228 && mouseX < 670 && mouseY < 380 & mouseDown
+					&& (TimerAsOfLastClick + 2) < metroGnome && currentScene.equals("A dark void") || currentScene.equals("Painting Room")) {
+				currentScene = "Atrium";
+				TimerAsOfLastClick = metroGnome;
+				playWav(doorSFX);
+			}
+			
 
 			if (mouseDown && mouseX > 160 && mouseY > 230 && mouseX < 650 && mouseY < 340
-					&& (currentScene.equals("darkroom") || currentScene.equals("lightroom"))
+					&& (currentScene.equals("A dark void") || currentScene.equals("Painting Room"))
 					&& cursorType.equals("magnifying_glass")) {
 				tooltip = "It's raining outside.";
 			} else if (mouseDown && mouseX > 60 && mouseY > 320 && mouseX < 100 && mouseY < 380
-					&& currentScene.equals("lightroom") && cursorType.equals("magnifying_glass")) {
+					&& currentScene.equals("Painting Room") && cursorType.equals("magnifying_glass")) {
 				tooltip = "It's a light switch.";
 			} else if (mouseDown && mouseX > 670 && mouseY > 300 && mouseX < 700 && mouseY < 430
-					&& (currentScene.equals("darkroom") || currentScene.equals("lightroom"))
+					&& (currentScene.equals("A dark void") || currentScene.equals("Painting Room"))
 					&& cursorType.equals("magnifying_glass")) {
 				tooltip = "It's the door to the hallway.";
-			} else if (mouseDown && (currentScene.equals("darkroom")) && cursorType.equals("magnifying_glass")) {
+			} else if (mouseDown && (currentScene.equals("A dark void")) && cursorType.equals("magnifying_glass")) {
 				tooltip = "It's a room.";
-			} else if (mouseDown && (currentScene.equals("lightroom")) && cursorType.equals("magnifying_glass")) {
+			} else if (mouseDown && (currentScene.equals("Painting Room")) && cursorType.equals("magnifying_glass")) {
 				tooltip = "It's an ugly room.";
 			}
 
@@ -699,10 +711,10 @@ public class GameWindow extends JFrame {
 
 				thundered = false;
 			}
-			if (currentScene.equals("atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
+			if (currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
 					&& mouseDown && MagnifyingGlassActive) {
 				tooltip = "It's a pin pointed to the island of Vitruvia.";
-			} else if (currentScene.equals("atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
+			} else if (currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
 					&& mouseDown) {
 				pinCollected = true;
 				tooltip = "It's a pin pointed to the island of Vitruvia.";
@@ -711,13 +723,18 @@ public class GameWindow extends JFrame {
 		}
 	}
 
-
 	private void draw(Graphics2D g) {
 		g.setFont(TimesNewHamster);
 		g.setColor(Color.BLACK);
 
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		switch (currentScene) {
+		case "Foyer":
+			g.setColor(Color.WHITE);
+			g.fillRect(0, 0, WIDTH, HEIGHT);
+			g.setColor(Color.BLACK);
+			g.drawString("room under construction", 150, 200);
+			break;
 		case "blank":
 			g.setColor(Color.BLACK);
 			g.fillRect(0, 0, WIDTH, HEIGHT);
@@ -746,28 +763,33 @@ public class GameWindow extends JFrame {
 			}
 
 			break;
-		case "darkroom":
-			g.drawImage(room1, 0, 0, WIDTH, HEIGHT, null);
-			break;
-		case "lightroom":
+		case "Painting Room":
 			g.drawImage(room2, 0, 0, WIDTH, HEIGHT, null);
 			break;
-		case "atrium":
+		case "A dark void":
+			g.drawImage(room1, 0, 0, WIDTH, HEIGHT, null);
+			break;
+		case "Atrium":
 			g.drawImage(room3, 0, -75, WIDTH, HEIGHT, null);
 			if (mouseX > 94 && mouseY > 367 && mouseX < 154 && mouseY < 406) {
 				g.drawImage(goto_1, 157, 353, -64, 64, null);
-			} else if (currentScene.equals("atrium")) {
+			} else if (currentScene.equals("Atrium")) {
 				g.drawImage(goto_0, 157, 353, -64, 64, null);
 			}
 
 			break;
 
-		case "hallway":
+		case "Main Hall":
 			g.drawImage(room4, 0, 0, WIDTH, HEIGHT, null);
+			if(mouseX > 720 && mouseY > 228 && mouseX < 780 && mouseY < 254) {
+				g.drawImage(goto_1, 786, 200, -64, 64, null);
+			} else {
+				g.drawImage(goto_0, 786, 200, -64, 64, null);
+			}
 			break;
-		case "outside":
+		case "Courtyard":
 			g.drawImage(outside0, 0, 0, WIDTH, HEIGHT, null);
-			if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("outside") && !frontDoorOpen) {
+			if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("Courtyard") && !frontDoorOpen) {
 				g.drawImage(outside1, 0, 0, WIDTH, HEIGHT, null);
 			}
 			if (frontDoorOpen) {
@@ -794,7 +816,7 @@ public class GameWindow extends JFrame {
 			break;
 		}
 
-		if (doorBellIsPressed && currentScene.equals("outside")) {
+		if (doorBellIsPressed && currentScene.equals("Courtyard")) {
 			g.drawImage(overlay_doorbell, 0, 0, WIDTH, HEIGHT, null);
 		}
 
@@ -811,21 +833,21 @@ public class GameWindow extends JFrame {
 			g.drawString("Hungy? " + Boolean.toString(foundSomething), 20, 210);
 			g.drawString("Last Click: " + Integer.toString(TimerAsOfLastClick), 20, 240);
 			g.drawString("Scene: " + currentScene, 20, 270);
-			g.drawString("TAOA: " + Integer.toString(TimerAsOfAmbience), 20, 300);
+			g.drawString("TAOA: " + Integer.toString(SpecialDoorbellDelay), 20, 300);
 		}
 		g.setColor(Color.WHITE);
 //        (Math.random() * 5) +
-		if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("darkroom")) {
+		if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("A dark void")) {
 			g.drawImage(room1_lightning, 0, 0, WIDTH, HEIGHT, null);
-		} else if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("atrium")) {
+		} else if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("Atrium")) {
 			g.drawImage(room3_lightning, 0, -75, WIDTH, HEIGHT, null);
 		}
 
 		// go-to arrows
 		if (mouseX > 617 && mouseY > 324 && mouseX < 670 && mouseY < 380
-				&& (currentScene.equals("lightroom") || currentScene.equals("darkroom"))) {
+				&& (currentScene.equals("Painting Room") || currentScene.equals("A dark void"))) {
 			g.drawImage(goto_1, 617, 324, 64, 64, null);
-		} else if (currentScene.equals("lightroom") || currentScene.equals("darkroom")) {
+		} else if (currentScene.equals("Painting Room") || currentScene.equals("A dark void")) {
 			g.drawImage(goto_0, 617, 324, 64, 64, null);
 		}
 		if (!inMenu && !currentScene.equals("blank")) {
@@ -862,12 +884,20 @@ public class GameWindow extends JFrame {
 					&& !(mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580))) {
 				foundSomething = false;
 			}
-			if (!pinCollected && currentScene.equals("atrium")) {
+			if (!pinCollected && currentScene.equals("Atrium")) {
 				g.drawImage(pin, 0, -75, WIDTH, HEIGHT, null);
 			}
 		}
+		if (!currentScene.equals("blank") && !inMenu
+//				&& !debugMode
+		) {
+			g.setColor(Color.WHITE);
+			g.drawString("Location:", 653, 523);
+			g.setFont(TimesNewHamsterPro);
+			g.drawString(currentScene, 653, 553);
+			g.setFont(TimesNewHamster);
+		}
 	}
-
 
 	private void drawCursor(Graphics2D g) {
 
