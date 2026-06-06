@@ -162,7 +162,7 @@ public class GameWindow extends JFrame {
 
 	public String gameName;
 
-	private boolean debugMode = true; // change to false before submitting
+	private boolean debugMode = false; // change to false before submitting
 
 	private int GameTimerWhenButtonsAppear = 5;
 	private boolean DrawTheButtons = false;
@@ -306,16 +306,18 @@ public class GameWindow extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				int key = e.getKeyCode();
-				if (key == KeyEvent.VK_2) {
-					currentScene = "Painting Room";
-				} else if (key == KeyEvent.VK_1) {
+				if (key == KeyEvent.VK_1) {
 					currentScene = "A dark void";
+				} else if (key == KeyEvent.VK_2) {
+					currentScene = "Painting Room";
 				} else if (key == KeyEvent.VK_3) {
 					currentScene = "Atrium";
 				} else if (key == KeyEvent.VK_4) {
 					currentScene = "Main Hall";
 				} else if (key == KeyEvent.VK_5) {
 					currentScene = "Courtyard";
+				} else if (key == KeyEvent.VK_6) {
+					currentScene = "Foyer";
 				} else if (key == KeyEvent.VK_M) {
 					currentScene = "menu";
 					inMenu = true;
@@ -605,7 +607,6 @@ public class GameWindow extends JFrame {
 
 			if (currentScene.equals("Courtyard") && (SpecialDoorbellDelay + 10) < metroGnome && mouseX > 320
 					&& mouseY > 200 && mouseX < 360 && mouseY < 300 && mouseDown) {
-				System.out.println("hi");
 				SpecialDoorbellDelay = metroGnome;
 				playWav(doorbellSFX);
 
@@ -618,7 +619,7 @@ public class GameWindow extends JFrame {
 
 			// the light switch in the painting room
 			if (mouseDown && mouseX > 70 && mouseY > 310 && mouseX < 104 && mouseY < 380
-					&& currentScene.equals("A dark void") && (TimerAsOfLastClick + 10) < metroGnome) {
+					&& currentScene.equals("A dark void") && (TimerAsOfLastClick + 2) < metroGnome) {
 				currentScene = "Painting Room";
 				playWav(clickSFX);
 				areTheLightsOnInThePaintingRoom = true;
@@ -626,15 +627,36 @@ public class GameWindow extends JFrame {
 			}
 
 			// go-to arrows on the logic side
- 
-			if(mouseDown && mouseX > 720 && mouseY > 228 && mouseX < 780 && mouseY < 254 && currentScene.equals("Main Hall")) {
+			if (mouseX > 641 && mouseY > 380 && mouseX < 624 && mouseY < 428 && mouseDown && currentScene.equals("Atrium")) {
+				currentScene = "Foyer";
+				playWav(doorSFX);
+				playWav(footstepsSFX);
+				tooltip = "What a nice Foyer.";
+			}
+			if (mouseDown && mouseX > 720 && mouseY > 228 && mouseX < 780 && mouseY < 254
+					&& currentScene.equals("Main Hall")) {
 				currentScene = "Foyer";
 				playWav(doorSFX);
 				playWav(footstepsSFX);
 				tooltip = "It's the Foyer.";
 			}
-			
-			
+			if (mouseDown && currentScene.equals("Foyer")) {
+				if (mouseX > 563 && mouseY > 368 && mouseX < 626 && mouseY < 418) {
+					currentScene = "Main Hall";
+					playWav(doorSFX);
+					playWav(footstepsSFX);
+					tooltip = "I'm back in the hallway.";
+				}
+
+				if (mouseX > 361 && mouseY > 160 && mouseX < 412 && mouseY < 218) {
+					currentScene = "Atrium";
+					playWav(doorSFX);
+
+					playWav(footstepsSFX);
+					tooltip = "This is the the top of the stairs.";
+				}
+			}
+
 			if (mouseDown && mouseX > 94 && mouseY > 367 && mouseX < 154 && mouseY < 406
 					&& currentScene.equals("Atrium") && (TimerAsOfLastClick + 2) < metroGnome) {
 				TimerAsOfLastClick = metroGnome;
@@ -668,20 +690,14 @@ public class GameWindow extends JFrame {
 			// mouse cursor position check is duplicated to leave ZERO logic code in the
 			// draw method.
 
-			if (mouseX > 617 && mouseY > 324 && mouseX < 670 && mouseY < 380 & mouseDown
-					&& (TimerAsOfLastClick + 2) < metroGnome && currentScene.equals("A dark void") || currentScene.equals("Painting Room")) {
+
+			if (mouseX > 620 && mouseY > 341 && mouseX < 670 && mouseY < 380 & mouseDown
+					&& (TimerAsOfLastClick + 2) < metroGnome && (currentScene.equals("A dark void")
+					|| currentScene.equals("Painting Room"))) {
 				currentScene = "Atrium";
 				TimerAsOfLastClick = metroGnome;
 				playWav(doorSFX);
 			}
-			
-			if (mouseX > 676 && mouseY > 228 && mouseX < 670 && mouseY < 380 & mouseDown
-					&& (TimerAsOfLastClick + 2) < metroGnome && currentScene.equals("A dark void") || currentScene.equals("Painting Room")) {
-				currentScene = "Atrium";
-				TimerAsOfLastClick = metroGnome;
-				playWav(doorSFX);
-			}
-			
 
 			if (mouseDown && mouseX > 160 && mouseY > 230 && mouseX < 650 && mouseY < 340
 					&& (currentScene.equals("A dark void") || currentScene.equals("Painting Room"))
@@ -734,6 +750,16 @@ public class GameWindow extends JFrame {
 			g.fillRect(0, 0, WIDTH, HEIGHT);
 			g.setColor(Color.BLACK);
 			g.drawString("room under construction", 150, 200);
+			if (mouseX > 563 && mouseY > 368 && mouseX < 626 && mouseY < 418) {
+				g.drawImage(goto_1, 563, 368, 64, 64, null);
+			} else {
+				g.drawImage(goto_0, 563, 368, 64, 64, null);
+			}
+			if (mouseX > 361 && mouseY > 160 && mouseX < 412 && mouseY < 218) {
+				g.drawImage(getRotatedImage(goto_1, 90), 361, 218, 64, -64, null);
+			} else {
+				g.drawImage(getRotatedImage(goto_0, 90), 361, 218, 64, -64, null);
+			}
 			break;
 		case "blank":
 			g.setColor(Color.BLACK);
@@ -776,12 +802,16 @@ public class GameWindow extends JFrame {
 			} else if (currentScene.equals("Atrium")) {
 				g.drawImage(goto_0, 157, 353, -64, 64, null);
 			}
-
+			if (mouseX > 641 && mouseY > 380 && mouseX < 624 && mouseY < 428) {
+				g.drawImage(getRotatedImage(goto_1, 90), 641, 380, -64, 64, null);
+			} else {
+				g.drawImage(getRotatedImage(goto_0, 90), 641, 380, -64, 64, null);
+			}
 			break;
 
 		case "Main Hall":
 			g.drawImage(room4, 0, 0, WIDTH, HEIGHT, null);
-			if(mouseX > 720 && mouseY > 228 && mouseX < 780 && mouseY < 254) {
+			if (mouseX > 720 && mouseY > 228 && mouseX < 780 && mouseY < 254) {
 				g.drawImage(goto_1, 786, 200, -64, 64, null);
 			} else {
 				g.drawImage(goto_0, 786, 200, -64, 64, null);
