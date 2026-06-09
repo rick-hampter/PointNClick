@@ -1,0 +1,4 @@
+1. make everything lookable with the magnifying glass
+2. make every variable a magic number
+3. possible arrow draw/logic method?
+4. make game linear, with linear inventory 2nd slot

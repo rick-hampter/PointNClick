@@ -627,9 +627,10 @@ public class GameWindow extends JFrame {
 			}
 
 			// go-to arrows on the logic side
-			if (mouseX > 641 && mouseY > 380 && mouseX < 624 && mouseY < 428 && mouseDown && currentScene.equals("Atrium")) {
+			if (mouseX > 591 && mouseY > 370 && mouseX < 629 && mouseY < 438 && mouseDown && currentScene.equals("Atrium")) {
 				currentScene = "Foyer";
 				playWav(doorSFX);
+				TimerAsOfLastClick = metroGnome;
 				playWav(footstepsSFX);
 				tooltip = "What a nice Foyer.";
 			}
@@ -640,7 +641,7 @@ public class GameWindow extends JFrame {
 				playWav(footstepsSFX);
 				tooltip = "It's the Foyer.";
 			}
-			if (mouseDown && currentScene.equals("Foyer")) {
+			if (mouseDown && currentScene.equals("Foyer")&& (TimerAsOfLastClick + 2) < metroGnome) {
 				if (mouseX > 563 && mouseY > 368 && mouseX < 626 && mouseY < 418) {
 					currentScene = "Main Hall";
 					playWav(doorSFX);
