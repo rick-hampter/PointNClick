@@ -179,6 +179,8 @@ public class GameWindow extends JFrame {
 	private boolean doorBellIsPressed = false;
 	private boolean rockIsSearched = false;
 	private boolean frontDoorOpen = false;
+	private int numLocksRemaining = 3;
+	private boolean theBasementDoorIsOpenYouCanCompleteTheGame = false;
 
 	private boolean areTheLightsOnInThePaintingRoom = false;
 
@@ -247,6 +249,11 @@ public class GameWindow extends JFrame {
 	private BufferedImage rock0;
 	private BufferedImage rock1;
 	private BufferedImage key0;
+	private BufferedImage b_door_3;
+	private BufferedImage b_door_2;
+	private BufferedImage b_door_1;
+	private BufferedImage b_door_0;
+	private BufferedImage b_door_open;
 
 	private BufferedImage black;
 
@@ -328,6 +335,23 @@ public class GameWindow extends JFrame {
 					} else if (!debugMode) {
 						debugMode = true;
 					}
+				} else if (key == KeyEvent.VK_C) {
+					if (debugMode) {
+						if (theBasementDoorIsOpenYouCanCompleteTheGame) {
+							theBasementDoorIsOpenYouCanCompleteTheGame = false;
+						} else {
+							theBasementDoorIsOpenYouCanCompleteTheGame = true;
+						}
+					}
+				} else if (key == KeyEvent.VK_V) {
+
+					if (debugMode)
+						if (numLocksRemaining >= 0 && numLocksRemaining < 3) {
+							numLocksRemaining++;
+						} else {
+							numLocksRemaining = 0;
+						}
+
 				}
 			}
 
@@ -444,6 +468,15 @@ public class GameWindow extends JFrame {
 		bgImage = ImageIO.read(new File("ui_scale4.png"));
 		uiButton0 = ImageIO.read(new File("button_scale4_0.png"));
 		uiButton1 = ImageIO.read(new File("button_scale4_1.png"));
+		b_door_3 = ImageIO.read(new File("door_3_locks.png"));
+		b_door_2 = ImageIO.read(new File("door_2_locks.png"));
+		;
+		b_door_1 = ImageIO.read(new File("door_1_lock.png"));
+		;
+		b_door_0 = ImageIO.read(new File("door_no_locks.png"));
+		;
+		b_door_open = ImageIO.read(new File("ominous_door_open.png"));
+		;
 
 		black = ImageIO.read(new File("void.png"));
 
@@ -628,7 +661,8 @@ public class GameWindow extends JFrame {
 			}
 
 			// go-to arrows on the logic side
-			if (mouseX > 591 && mouseY > 370 && mouseX < 629 && mouseY < 438 && mouseDown && currentScene.equals("Atrium")) {
+			if (mouseX > 591 && mouseY > 370 && mouseX < 629 && mouseY < 438 && mouseDown
+					&& currentScene.equals("Atrium")) {
 				currentScene = "Foyer";
 				playWav(doorSFX);
 				TimerAsOfLastClick = metroGnome;
@@ -642,7 +676,7 @@ public class GameWindow extends JFrame {
 				playWav(footstepsSFX);
 				tooltip = "It's the Foyer.";
 			}
-			if (mouseDown && currentScene.equals("Foyer")&& (TimerAsOfLastClick + 2) < metroGnome) {
+			if (mouseDown && currentScene.equals("Foyer") && (TimerAsOfLastClick + 2) < metroGnome) {
 				if (mouseX > 563 && mouseY > 368 && mouseX < 626 && mouseY < 418) {
 					currentScene = "Main Hall";
 					playWav(doorSFX);
@@ -692,10 +726,9 @@ public class GameWindow extends JFrame {
 			// mouse cursor position check is duplicated to leave ZERO logic code in the
 			// draw method.
 
-
 			if (mouseX > 620 && mouseY > 341 && mouseX < 670 && mouseY < 380 & mouseDown
-					&& (TimerAsOfLastClick + 2) < metroGnome && (currentScene.equals("A dark void")
-					|| currentScene.equals("Painting Room"))) {
+					&& (TimerAsOfLastClick + 2) < metroGnome
+					&& (currentScene.equals("A dark void") || currentScene.equals("Painting Room"))) {
 				currentScene = "Atrium";
 				TimerAsOfLastClick = metroGnome;
 				playWav(doorSFX);
@@ -766,6 +799,27 @@ public class GameWindow extends JFrame {
 				g.drawImage(getRotatedImage(goto_1, 90), 361, 218, 64, -64, null);
 			} else {
 				g.drawImage(getRotatedImage(goto_0, 90), 361, 218, 64, -64, null);
+			}
+			if (!theBasementDoorIsOpenYouCanCompleteTheGame) {
+				switch (numLocksRemaining) {
+				case 3:
+					g.drawImage(b_door_3, 0, 0, WIDTH, HEIGHT, null);
+					break;
+				case 2:
+					g.drawImage(b_door_2, 0, 0, WIDTH, HEIGHT, null);
+					break;
+				case 1:
+					g.drawImage(b_door_1, 0, 0, WIDTH, HEIGHT, null);
+					break;
+				case 0:
+					g.drawImage(b_door_0, 0, 0, WIDTH, HEIGHT, null);
+					break;
+
+				default:
+					break;
+				}
+			} else {
+				g.drawImage(b_door_open, 0, 0, WIDTH, HEIGHT, null);
 			}
 			break;
 		case "blank":
@@ -870,7 +924,7 @@ public class GameWindow extends JFrame {
 			g.drawString("Hungy? " + Boolean.toString(foundSomething), 20, 210);
 			g.drawString("Last Click: " + Integer.toString(TimerAsOfLastClick), 20, 240);
 			g.drawString("Scene: " + currentScene, 20, 270);
-			g.drawString("TAOA: " + Integer.toString(SpecialDoorbellDelay), 20, 300);
+			g.drawString("numLocksRemaining: " + Integer.toString(numLocksRemaining), 20, 300);
 		}
 		g.setColor(Color.WHITE);
 //        (Math.random() * 5) +
