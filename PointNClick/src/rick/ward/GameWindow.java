@@ -239,6 +239,7 @@ public class GameWindow extends JFrame {
 	private BufferedImage room3;
 	private BufferedImage room3_lightning;
 	private BufferedImage room4;
+	private BufferedImage room5;
 	private BufferedImage outside0;
 	private BufferedImage outside1;
 	private BufferedImage outside2;
@@ -473,7 +474,7 @@ public class GameWindow extends JFrame {
 		rock1 = ImageIO.read(new File("rock1.png"));
 		;
 		key0 = ImageIO.read(new File("key_onGround.png"));
-		;
+		room5 = ImageIO.read(new File("room_foyer.png"));
 
 		room3_lightning = ImageIO.read(new File("room3_lightning.png"));
 		room4 = ImageIO.read(new File("room4.png"));
@@ -745,12 +746,17 @@ public class GameWindow extends JFrame {
 		g.setColor(Color.BLACK);
 
 		g.fillRect(0, 0, WIDTH, HEIGHT);
+		g.setColor(Color.RED);
+		g.drawString("IF YOU'RE SEEING THIS,", 200, 150);
+		g.drawString("AN ERROR HAS OCCURRED", 200, 200);
+		g.setColor(Color.BLACK);
 		switch (currentScene) {
 		case "Foyer":
-			g.setColor(Color.WHITE);
-			g.fillRect(0, 0, WIDTH, HEIGHT);
-			g.setColor(Color.BLACK);
-			g.drawString("room under construction", 150, 200);
+			g.drawImage(room5, 0, 0, WIDTH, HEIGHT, null);
+//			g.setColor(Color.WHITE);
+//			g.fillRect(0, 0, WIDTH, HEIGHT);
+//			g.setColor(Color.BLACK);
+//			g.drawString("room under construction", 150, 200);
 			if (mouseX > 563 && mouseY > 368 && mouseX < 626 && mouseY < 418) {
 				g.drawImage(goto_1, 563, 368, 64, 64, null);
 			} else {
