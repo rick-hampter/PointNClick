@@ -523,7 +523,7 @@ public class GameWindow extends JFrame {
 		goto_1 = ImageIO.read(new File("go_to_1_x16.png"));
 		pin = ImageIO.read(new File("collectable_room2_pin.png"));
 		key_orange = ImageIO.read(new File("key_orange.png"));
-		key_pink= ImageIO.read(new File("key_pink.png"));
+		key_pink = ImageIO.read(new File("key_pink.png"));
 	}
 
 	private boolean thundered = false;
@@ -581,7 +581,8 @@ public class GameWindow extends JFrame {
 				cursorType = "clicker";
 				TimerAsOfLastClick = metroGnome;
 			} else if (mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580
-					&& !cursorType.equals("held_key") && !MagnifyingGlassActive && (TimerAsOfLastClick + 1) < metroGnome && !anyDoorKeyIsBeingHeld) {
+					&& !cursorType.equals("held_key") && !MagnifyingGlassActive && (TimerAsOfLastClick + 1) < metroGnome
+					&& !anyDoorKeyIsBeingHeld) {
 				MagnifyingGlassActive = true;
 				cursorType = "magnifying_glass";
 				TimerAsOfLastClick = metroGnome;
@@ -595,27 +596,31 @@ public class GameWindow extends JFrame {
 			}
 
 			// the door to the basement begins here
-			//190, 247
-			//309, 450
-			//theBasementDoorIsOpenYouCanCompleteTheGame
-			if(cursorType.equals("held_key") && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450 && (TimerAsOfLastClick + 1) < metroGnome) {
-				TimerAsOfLastClick = metroGnome;
-				numLocksRemaining--;
-				currentKeyColour = "spoink";
-				tooltip = "It unlocked like a Spoink on a Friday night.";
-			} else if(numLocksRemaining == 0) {
-				theBasementDoorIsOpenYouCanCompleteTheGame = true;
-				tooltip = "How ominous...";
-				playWav(doorSFX);
-			} else {
-				TimerAsOfLastClick = metroGnome;
-				playWav(knockSFX);
-				tooltip = "No one could possibly be behind this door.";
+			// 190, 247
+			// 309, 450
+			// theBasementDoorIsOpenYouCanCompleteTheGame
+			if (currentScene.equals("Foyer")) {
+				if (cursorType.equals("held_key") && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
+						&& (TimerAsOfLastClick + 1) < metroGnome && mouseDown && numLocksRemaining > 0) {
+					TimerAsOfLastClick = metroGnome;
+					numLocksRemaining--;
+					currentKeyColour = "spoink";
+					cursorType = "clicker";
+					tooltip = "It unlocked like a Spoink on a Friday night.";
+				} else if (!theBasementDoorIsOpenYouCanCompleteTheGame && numLocksRemaining == 0 && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
+						&& (TimerAsOfLastClick + 1) < metroGnome && mouseDown) {
+					theBasementDoorIsOpenYouCanCompleteTheGame = true;
+					tooltip = "How ominous...";
+					playWav(doorSFX);
+				} else if (!theBasementDoorIsOpenYouCanCompleteTheGame && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
+						&& (TimerAsOfLastClick + 1) < metroGnome && mouseDown) {
+					TimerAsOfLastClick = metroGnome;
+					playWav(knockSFX);
+					tooltip = "No one could possibly be behind this door.";
+				}
 			}
 			// ends here
-			
-			
-			
+
 			// rock logic
 
 			if (currentScene.equals("Courtyard") && (TimerAsOfLastClick + 1) < metroGnome && mouseX > 164
@@ -785,9 +790,9 @@ public class GameWindow extends JFrame {
 
 				thundered = false;
 			}
-			
+
 			// the key in the globe
-			
+
 			if (currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
 					&& mouseDown && MagnifyingGlassActive) {
 				tooltip = "It's a purple key stabbed into a globe.";
@@ -952,7 +957,7 @@ public class GameWindow extends JFrame {
 			g.drawString("Hungy? " + Boolean.toString(foundSomething), 20, 210);
 			g.drawString("Last Click: " + Integer.toString(TimerAsOfLastClick), 20, 240);
 			g.drawString("Scene: " + currentScene, 20, 270);
-			g.drawString("numLocksRemaining: " + Integer.toString(numLocksRemaining), 20, 300);
+			g.drawString("currentKeyColour: " + currentKeyColour, 20, 300);
 		}
 		g.setColor(Color.WHITE);
 //        (Math.random() * 5) +
@@ -992,20 +997,7 @@ public class GameWindow extends JFrame {
 			if (!MagnifyingGlassActive) {
 				g.drawImage(magnifying_glass, 270, 450, 160, 160, null);
 			}
-			if (!currentKeyColour.equals("spoink")) {
-				switch(currentKeyColour) {
-				case "green":
-					break;
-				case "pink":
-					g.drawImage(key_pink, 470, 450, 160, 160, null);
-					break;
-				case "orange":
-					g.drawImage(key_orange, 470, 450, 160, 160, null);
-					break;
-				default: break;
-					
-				}
-			}
+
 
 			if (!mouseDown && mouseX > 470 && mouseY > 450 && mouseX < 630 && mouseY < 580) {
 				g.drawImage(uiButton0, 470, 450, 160, 160, null);
@@ -1020,6 +1012,7 @@ public class GameWindow extends JFrame {
 			if (!pinCollected && currentScene.equals("Atrium")) {
 				g.drawImage(pin, 0, -75, WIDTH, HEIGHT, null);
 			}
+			
 		}
 		if (!currentScene.equals("blank") && !inMenu
 //				&& !debugMode
@@ -1029,6 +1022,27 @@ public class GameWindow extends JFrame {
 			g.setFont(TimesNewHamsterPro);
 			g.drawString(currentScene, 653, 553);
 			g.setFont(TimesNewHamster);
+			if (currentKeyColour.equals("pink")) {
+				g.drawImage(key_pink, 470, 450, 160, 160, null);
+			}
+			if (currentKeyColour.equals("orange")) {
+				g.drawImage(key_orange, 470, 450, 160, 160, null);
+			}
+//			if (!currentKeyColour.equals("spoink")) {
+//				switch (currentKeyColour) {
+//				case "green":
+//					break;
+//				case "pink":
+//					g.drawImage(key_pink, 470, 450, 160, 160, null);
+//					break;
+//				case "orange":
+//					g.drawImage(key_orange, 470, 450, 160, 160, null);
+//					break;
+//				default:
+//					break;
+//
+//				}
+//			}
 		}
 	}
 
@@ -1057,7 +1071,7 @@ public class GameWindow extends JFrame {
 
 		else if (cursorType.equals("held_key")) {
 			g.drawImage(key_cursor, mouseX - hotspotX, mouseY - hotspotY, 64, 64, null);
-			if(frontDoorOpen && !debugMode) {
+			if (frontDoorOpen && !debugMode) {
 				g.setFont(TimesNewHamsterPro);
 				g.setColor(Color.red);
 				g.drawString("I, Rick, am aware that this key is the wrong colour.", mouseX, mouseY);
