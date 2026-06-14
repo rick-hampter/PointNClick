@@ -160,7 +160,13 @@ public class GameWindow extends JFrame {
 	private String currentKeyColour = "spoink";
 	private boolean foundSomething = false;
 	private boolean areTheLightsOn = false;
+	private boolean PaintingMoved = false;
 
+	
+	
+	private boolean purpleKeyCollected = false;
+	private boolean orangeKeyCollected = false;
+	private boolean greenKeyCollected = false;
 	public String gameName;
 
 	private boolean debugMode = false; // change to false before submitting
@@ -276,6 +282,10 @@ public class GameWindow extends JFrame {
 	private BufferedImage pin;
 	private BufferedImage key_pink;
 	private BufferedImage key_orange;
+	private BufferedImage key_green;
+	
+	private BufferedImage cutout;
+	private BufferedImage painting;
 
 	private static int cinematicDelay = 999;
 	private static boolean cinematicDelayOver = false;
@@ -453,7 +463,7 @@ public class GameWindow extends JFrame {
 	private void setup() throws IOException {
 		String[] Titles = { "Proffesor", "Doctor", "Inspector", "Detective", "Mr.", "Grand Inquisitor", "Dr.", "Sir",
 				"Lord" };
-		String[] ProperNouns = { "Blambry", "Cave Johnson", "Steve", "Gorbelstein", "Edlai", "Virgil", "Wheatley",
+		String[] ProperNouns = { "Blambry", "Cave Johnson", "Steve", "Einstein", "Edlai", "Virgil", "Wheatley",
 				"Nigel", "Stirling", "Conly", "Greg" };
 		String[] Nouns = { "the Conundrum", "the Mystery", "his Dillema", "the Universe's Cube",
 				"Doctor Langeskov's Invention", "Doctor Langeskov's Cube", "the Cube", "the King's Missing Socks" };
@@ -524,6 +534,9 @@ public class GameWindow extends JFrame {
 		pin = ImageIO.read(new File("collectable_room2_pin.png"));
 		key_orange = ImageIO.read(new File("key_orange.png"));
 		key_pink = ImageIO.read(new File("key_pink.png"));
+		key_green = ImageIO.read(new File("key_green.png"));
+		painting = ImageIO.read(new File("painting.png"));
+		cutout = ImageIO.read(new File("cutout.png"));
 	}
 
 	private boolean thundered = false;
@@ -599,13 +612,15 @@ public class GameWindow extends JFrame {
 			// 190, 247
 			// 309, 450
 			// theBasementDoorIsOpenYouCanCompleteTheGame
+
 			if (currentScene.equals("Foyer")) {
-				if (cursorType.equals("held_key") && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
+				if (!purpleKeyCollected && cursorType.equals("held_key") && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
 						&& (TimerAsOfLastClick + 1) < metroGnome && mouseDown && numLocksRemaining > 0) {
 					TimerAsOfLastClick = metroGnome;
 					numLocksRemaining--;
 					currentKeyColour = "spoink";
 					cursorType = "clicker";
+					playWav(omenSFX);
 					tooltip = "It unlocked like a Spoink on a Friday night.";
 				} else if (!theBasementDoorIsOpenYouCanCompleteTheGame && numLocksRemaining == 0 && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
 						&& (TimerAsOfLastClick + 1) < metroGnome && mouseDown) {
@@ -796,12 +811,21 @@ public class GameWindow extends JFrame {
 			if (currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
 					&& mouseDown && MagnifyingGlassActive) {
 				tooltip = "It's a purple key stabbed into a globe.";
-			} else if (currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
+			} else if (currentKeyColour.equals("spoink") &&  currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
 					&& mouseDown && !MagnifyingGlassActive) {
 				pinCollected = true;
 				cursorType = "held_key";
 				currentKeyColour = "pink";
+
 				tooltip = "This was as easy as taking a key from a missing person.";
+			}
+			// the key in the coat 216, 250 to 236, 354
+			if (!orangeKeyCollected && currentKeyColour.equals("spoink") && currentScene.equals("Main Hall") && mouseX > 216 && mouseY > 250 && mouseX < 236 && mouseY < 354
+					&& mouseDown && !MagnifyingGlassActive) {
+				cursorType = "held_key";
+				currentKeyColour = "orange";
+				orangeKeyCollected = true;
+				tooltip = "A key in the coat pocket!";
 			}
 
 		}
@@ -1027,6 +1051,9 @@ public class GameWindow extends JFrame {
 			}
 			if (currentKeyColour.equals("orange")) {
 				g.drawImage(key_orange, 470, 450, 160, 160, null);
+			}
+			if (currentKeyColour.equals("green")) {
+				g.drawImage(key_green, 470, 450, 160, 160, null);
 			}
 //			if (!currentKeyColour.equals("spoink")) {
 //				switch (currentKeyColour) {
