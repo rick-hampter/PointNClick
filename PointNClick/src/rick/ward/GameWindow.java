@@ -162,8 +162,6 @@ public class GameWindow extends JFrame {
 	private boolean areTheLightsOn = false;
 	private boolean PaintingMoved = false;
 
-	
-	
 	private boolean purpleKeyCollected = false;
 	private boolean orangeKeyCollected = false;
 	private boolean greenKeyCollected = false;
@@ -213,6 +211,7 @@ public class GameWindow extends JFrame {
 	private static File thunderSFX = new File("thunder.wav");
 
 	private static File rainAMB = new File("rain_amb.wav");
+	private static File musicAMB = new File("finish_game.wav");
 	private static File jazzAMB = new File("Kevin Macleod - Vibing Over Venus.wav");
 
 	private static double LatestRNG = 0;
@@ -283,7 +282,7 @@ public class GameWindow extends JFrame {
 	private BufferedImage key_pink;
 	private BufferedImage key_orange;
 	private BufferedImage key_green;
-	
+
 	private BufferedImage cutout;
 	private BufferedImage painting;
 
@@ -463,8 +462,8 @@ public class GameWindow extends JFrame {
 	private void setup() throws IOException {
 		String[] Titles = { "Proffesor", "Doctor", "Inspector", "Detective", "Mr.", "Grand Inquisitor", "Dr.", "Sir",
 				"Lord" };
-		String[] ProperNouns = { "Blambry", "Cave Johnson", "Steve", "Einstein", "Edlai", "Virgil", "Wheatley",
-				"Nigel", "Stirling", "Conly", "Greg" };
+		String[] ProperNouns = { "Blambry", "Cave Johnson", "Steve", "Einstein", "Edlai", "Virgil", "Wheatley", "Nigel",
+				"Stirling", "Conly", "Greg" };
 		String[] Nouns = { "the Conundrum", "the Mystery", "his Dillema", "the Universe's Cube",
 				"Doctor Langeskov's Invention", "Doctor Langeskov's Cube", "the Cube", "the King's Missing Socks" };
 		String[] Catches = { "of Doom", "of Death", "to Infinity and Beyond", "of the Missing City",
@@ -579,6 +578,29 @@ public class GameWindow extends JFrame {
 
 		} else {
 
+			if (!PaintingMoved && currentScene.equals("Painting Room")
+					&& (mouseX > 328 && mouseY > 85 && mouseX < 500 && mouseY < 140) && mouseDown
+					&& cursorType.equals("clicker") && (TimerAsOfLastClick + 1 < metroGnome)) {
+				PaintingMoved = true;
+				TimerAsOfLastClick = metroGnome;
+				playWav(rockSFX);
+				tooltip = "Oldest trick in the book!";
+			}
+			if (currentKeyColour.equals("spoink") &&  PaintingMoved && currentScene.equals("Painting Room")
+					&& (mouseX > 447 && mouseY > 115 && mouseX < 500 && mouseY < 179) && mouseDown
+					&& cursorType.equals("clicker") && (TimerAsOfLastClick + 1 < metroGnome)) {
+				currentKeyColour = "green";
+				greenKeyCollected = true;
+				tooltip = "How secure.";
+
+			}
+
+			if (theBasementDoorIsOpenYouCanCompleteTheGame && currentScene.equals("Foyer")
+					&& (mouseX > 238 && mouseY > 379 && mouseX < 274 && mouseY < 423) && mouseDown) {
+				currentScene = "basement";
+				playWav(musicAMB);
+				setRainVolume(-1.0f);
+			}
 			if (metroGnome > cinematicDelay && !cinematicDelayOver) {
 				cinematicDelayOver = true;
 				currentScene = "Courtyard";
@@ -589,13 +611,13 @@ public class GameWindow extends JFrame {
 			}
 
 			if (mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580 && MagnifyingGlassActive
-					&& (TimerAsOfLastClick + 1) < metroGnome && !anyDoorKeyIsBeingHeld) {
+					&& (TimerAsOfLastClick + 1) < metroGnome) {
 				MagnifyingGlassActive = false;
 				cursorType = "clicker";
 				TimerAsOfLastClick = metroGnome;
 			} else if (mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580
-					&& !cursorType.equals("held_key") && !MagnifyingGlassActive && (TimerAsOfLastClick + 1) < metroGnome
-					&& !anyDoorKeyIsBeingHeld) {
+					&& !cursorType.equals("held_key") && !MagnifyingGlassActive
+					&& (TimerAsOfLastClick + 1) < metroGnome) {
 				MagnifyingGlassActive = true;
 				cursorType = "magnifying_glass";
 				TimerAsOfLastClick = metroGnome;
@@ -614,21 +636,23 @@ public class GameWindow extends JFrame {
 			// theBasementDoorIsOpenYouCanCompleteTheGame
 
 			if (currentScene.equals("Foyer")) {
-				if (!purpleKeyCollected && cursorType.equals("held_key") && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
-						&& (TimerAsOfLastClick + 1) < metroGnome && mouseDown && numLocksRemaining > 0) {
+				if (!purpleKeyCollected && cursorType.equals("held_key") && mouseX > 190 && mouseY > 247 && mouseX < 309
+						&& mouseY < 450 && (TimerAsOfLastClick + 1) < metroGnome && mouseDown
+						&& numLocksRemaining > 0) {
 					TimerAsOfLastClick = metroGnome;
 					numLocksRemaining--;
 					currentKeyColour = "spoink";
 					cursorType = "clicker";
 					playWav(omenSFX);
 					tooltip = "It unlocked like a Spoink on a Friday night.";
-				} else if (!theBasementDoorIsOpenYouCanCompleteTheGame && numLocksRemaining == 0 && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
-						&& (TimerAsOfLastClick + 1) < metroGnome && mouseDown) {
+				} else if (!theBasementDoorIsOpenYouCanCompleteTheGame && numLocksRemaining == 0 && mouseX > 190
+						&& mouseY > 247 && mouseX < 309 && mouseY < 450 && (TimerAsOfLastClick + 1) < metroGnome
+						&& mouseDown) {
 					theBasementDoorIsOpenYouCanCompleteTheGame = true;
 					tooltip = "How ominous...";
 					playWav(doorSFX);
-				} else if (!theBasementDoorIsOpenYouCanCompleteTheGame && mouseX > 190 && mouseY > 247 && mouseX < 309 && mouseY < 450
-						&& (TimerAsOfLastClick + 1) < metroGnome && mouseDown) {
+				} else if (!theBasementDoorIsOpenYouCanCompleteTheGame && mouseX > 190 && mouseY > 247 && mouseX < 309
+						&& mouseY < 450 && (TimerAsOfLastClick + 1) < metroGnome && mouseDown) {
 					TimerAsOfLastClick = metroGnome;
 					playWav(knockSFX);
 					tooltip = "No one could possibly be behind this door.";
@@ -659,6 +683,7 @@ public class GameWindow extends JFrame {
 					&& anyDoorKeyIsBeingHeld) {
 				TimerAsOfLastClick = metroGnome;
 				tooltip = "It's wide open.";
+				currentKeyColour = "spoink";
 				frontDoorOpen = true;
 				anyDoorKeyIsBeingHeld = false;
 				cursorType = "clicker";
@@ -675,8 +700,9 @@ public class GameWindow extends JFrame {
 				TimerAsOfLastClick = metroGnome;
 				anyDoorKeyIsBeingHeld = true;
 				frontDoorKeyCollected = true;
-				cursorType = "held_key";
+//				cursorType = "held_key";
 				MagnifyingGlassActive = false;
+				currentKeyColour = "brass";
 				tooltip = "The key isn't rusted at all.";
 			}
 
@@ -806,23 +832,36 @@ public class GameWindow extends JFrame {
 				thundered = false;
 			}
 
+			if (!MagnifyingGlassActive && mouseDown && TimerAsOfLastClick < metroGnome
+					&& (mouseX > 475 && mouseY > 450 && mouseX < 630 && mouseY < 580)) {
+				TimerAsOfLastClick = metroGnome;
+				if (!currentKeyColour.equals("spoink")) {
+					if (cursorType.equals("held_key")) {
+						cursorType = "clicker";
+					} else {
+						cursorType = "held_key";
+					}
+				}
+			}
+
 			// the key in the globe
 
 			if (currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
 					&& mouseDown && MagnifyingGlassActive) {
 				tooltip = "It's a purple key stabbed into a globe.";
-			} else if (currentKeyColour.equals("spoink") &&  currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
-					&& mouseDown && !MagnifyingGlassActive) {
+			} else if (currentKeyColour.equals("spoink") && currentScene.equals("Atrium") && mouseX > 500
+					&& mouseY > 180 && mouseX < 530 && mouseY < 217 && mouseDown && !MagnifyingGlassActive) {
 				pinCollected = true;
-				cursorType = "held_key";
+//				cursorType = "held_key";
 				currentKeyColour = "pink";
 
 				tooltip = "This was as easy as taking a key from a missing person.";
 			}
 			// the key in the coat 216, 250 to 236, 354
-			if (!orangeKeyCollected && currentKeyColour.equals("spoink") && currentScene.equals("Main Hall") && mouseX > 216 && mouseY > 250 && mouseX < 236 && mouseY < 354
-					&& mouseDown && !MagnifyingGlassActive) {
-				cursorType = "held_key";
+			if (!orangeKeyCollected && currentKeyColour.equals("spoink") && currentScene.equals("Main Hall")
+					&& mouseX > 216 && mouseY > 250 && mouseX < 236 && mouseY < 354 && mouseDown
+					&& !MagnifyingGlassActive) {
+//				cursorType = "held_key";
 				currentKeyColour = "orange";
 				orangeKeyCollected = true;
 				tooltip = "A key in the coat pocket!";
@@ -841,6 +880,12 @@ public class GameWindow extends JFrame {
 		g.drawString("AN ERROR HAS OCCURRED", 200, 200);
 		g.setColor(Color.BLACK);
 		switch (currentScene) {
+		case "basement":
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, WIDTH, HEIGHT);
+			g.setColor(Color.cyan);
+			g.drawString("YOU COMPLETED THE GAME!!!!", 270, 370);
+			break;
 		case "Foyer":
 			g.drawImage(room5, 0, 0, WIDTH, HEIGHT, null);
 //			g.setColor(Color.WHITE);
@@ -853,10 +898,11 @@ public class GameWindow extends JFrame {
 				g.drawImage(goto_0, 563, 368, 64, 64, null);
 			}
 			if (mouseX > 361 && mouseY > 160 && mouseX < 412 && mouseY < 218) {
-				g.drawImage(getRotatedImage(goto_1, 90), 361, 218, 64, -64, null);
+				g.drawImage(getRotatedImage(goto_1, 90), 361, 180, 64, -64, null);
 			} else {
-				g.drawImage(getRotatedImage(goto_0, 90), 361, 218, 64, -64, null);
+				g.drawImage(getRotatedImage(goto_0, 90), 361, 180, 64, -64, null);
 			}
+
 			if (!theBasementDoorIsOpenYouCanCompleteTheGame) {
 				switch (numLocksRemaining) {
 				case 3:
@@ -877,6 +923,13 @@ public class GameWindow extends JFrame {
 				}
 			} else {
 				g.drawImage(b_door_open, 0, 0, WIDTH, HEIGHT, null);
+			}
+			if (theBasementDoorIsOpenYouCanCompleteTheGame) {
+				if (mouseX > 238 && mouseY > 379 && mouseX < 274 && mouseY < 423) {
+					g.drawImage(getRotatedImage(goto_1, 90), 238, 379, 64, -64, null);
+				} else {
+					g.drawImage(getRotatedImage(goto_0, 90), 238, 379, 64, -64, null);
+				}
 			}
 			break;
 		case "blank":
@@ -909,6 +962,15 @@ public class GameWindow extends JFrame {
 			break;
 		case "Painting Room":
 			g.drawImage(room2, 0, 0, WIDTH, HEIGHT, null);
+			if (!PaintingMoved) {
+				g.drawImage(painting, 0, 0, WIDTH, HEIGHT, null);
+			} else {
+				g.drawImage(cutout, 0, 0, WIDTH, HEIGHT, null);
+				g.drawImage(painting, -150, 0, WIDTH, HEIGHT, null);
+				if (!greenKeyCollected) {
+					g.drawImage(key_green, 447, 115, 64, 64, null);
+				}
+			}
 			break;
 		case "A dark void":
 			g.drawImage(room1, 0, 0, WIDTH, HEIGHT, null);
@@ -963,98 +1025,104 @@ public class GameWindow extends JFrame {
 		default:
 			break;
 		}
+		if (!currentScene.equals("basement")) {
+			if (doorBellIsPressed && currentScene.equals("Courtyard")) {
+				g.drawImage(overlay_doorbell, 0, 0, WIDTH, HEIGHT, null);
+			}
 
-		if (doorBellIsPressed && currentScene.equals("Courtyard")) {
-			g.drawImage(overlay_doorbell, 0, 0, WIDTH, HEIGHT, null);
-		}
+			g.setColor(Color.WHITE);
+			if (debugMode) {
+				g.setColor(Color.MAGENTA);
+				g.drawString("DEBUGGING", 20, 30);
+				g.drawString("MouseX " + Integer.toString(mouseX), 20, 60);
+				g.drawString("MouseY " + Integer.toString(mouseY), 20, 90);
+				g.drawString("Game timer: " + Integer.toString(metroGnome), 20, 120);
 
-		g.setColor(Color.WHITE);
-		if (debugMode) {
-			g.setColor(Color.MAGENTA);
-			g.drawString("DEBUGGING", 20, 30);
-			g.drawString("MouseX " + Integer.toString(mouseX), 20, 60);
-			g.drawString("MouseY " + Integer.toString(mouseY), 20, 90);
-			g.drawString("Game timer: " + Integer.toString(metroGnome), 20, 120);
-
-			g.drawString("Mouse is being clicked: " + Boolean.toString(mouseDown), 20, 150);
-			g.drawString("Magnifying Glass Active: " + Boolean.toString(MagnifyingGlassActive), 20, 180);
-			g.drawString("Hungy? " + Boolean.toString(foundSomething), 20, 210);
-			g.drawString("Last Click: " + Integer.toString(TimerAsOfLastClick), 20, 240);
-			g.drawString("Scene: " + currentScene, 20, 270);
-			g.drawString("currentKeyColour: " + currentKeyColour, 20, 300);
-		}
-		g.setColor(Color.WHITE);
+				g.drawString("Mouse is being clicked: " + Boolean.toString(mouseDown), 20, 150);
+				g.drawString("Magnifying Glass Active: " + Boolean.toString(MagnifyingGlassActive), 20, 180);
+				g.drawString("Hungy? " + Boolean.toString(foundSomething), 20, 210);
+				g.drawString("Last Click: " + Integer.toString(TimerAsOfLastClick), 20, 240);
+				g.drawString("Scene: " + currentScene, 20, 270);
+				g.drawString(
+						"theBasementDoorIsOpenYouCanCompleteTheGame: " + theBasementDoorIsOpenYouCanCompleteTheGame, 20,
+						300);
+			}
+			g.setColor(Color.WHITE);
 //        (Math.random() * 5) +
-		if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("A dark void")) {
-			g.drawImage(room1_lightning, 0, 0, WIDTH, HEIGHT, null);
-		} else if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("Atrium")) {
-			g.drawImage(room3_lightning, 0, -75, WIDTH, HEIGHT, null);
-		}
-
-		// go-to arrows
-		if (mouseX > 617 && mouseY > 324 && mouseX < 670 && mouseY < 380
-				&& (currentScene.equals("Painting Room") || currentScene.equals("A dark void"))) {
-			g.drawImage(goto_1, 617, 324, 64, 64, null);
-		} else if (currentScene.equals("Painting Room") || currentScene.equals("A dark void")) {
-			g.drawImage(goto_0, 617, 324, 64, 64, null);
-		}
-		if (!inMenu && !currentScene.equals("blank")) {
-			g.drawImage(bgImage, 0, 0, WIDTH, HEIGHT, null);
-			g.setColor(Color.WHITE);
-
-			g.drawString("Some Thoughts:", 8, 560);
-			g.setFont(TimesNewHamsterPro);
-			g.drawString(tooltip, 8, 590);
-
-			g.setFont(TimesNewHamster);
-
-			if (!mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580) {
-				g.drawImage(uiButton0, 270, 450, 160, 160, null);
-				foundSomething = true;
-			} else if (mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580) {
-				g.drawImage(uiButton1, 270, 450, 160, 160, null);
-				foundSomething = true;
-
-			} else {
-				g.drawImage(uiButton1, 270, 450, 160, 160, null);
-			}
-			if (!MagnifyingGlassActive) {
-				g.drawImage(magnifying_glass, 270, 450, 160, 160, null);
+			if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("A dark void")) {
+				g.drawImage(room1_lightning, 0, 0, WIDTH, HEIGHT, null);
+			} else if ((TimerAsOfEffect + 1) > metroGnome && currentScene.equals("Atrium")) {
+				g.drawImage(room3_lightning, 0, -75, WIDTH, HEIGHT, null);
 			}
 
+			// go-to arrows
+			if (mouseX > 617 && mouseY > 324 && mouseX < 670 && mouseY < 380
+					&& (currentScene.equals("Painting Room") || currentScene.equals("A dark void"))) {
+				g.drawImage(goto_1, 617, 324, 64, 64, null);
+			} else if (currentScene.equals("Painting Room") || currentScene.equals("A dark void")) {
+				g.drawImage(goto_0, 617, 324, 64, 64, null);
+			}
+			if (!inMenu && !currentScene.equals("blank")) {
+				g.drawImage(bgImage, 0, 0, WIDTH, HEIGHT, null);
+				g.setColor(Color.WHITE);
 
-			if (!mouseDown && mouseX > 470 && mouseY > 450 && mouseX < 630 && mouseY < 580) {
-				g.drawImage(uiButton0, 470, 450, 160, 160, null);
-				foundSomething = true;
-			} else {
-				g.drawImage(uiButton1, 470, 450, 160, 160, null);
+				g.drawString("Some Thoughts:", 8, 560);
+				g.setFont(TimesNewHamsterPro);
+				g.drawString(tooltip, 8, 590);
+
+				g.setFont(TimesNewHamster);
+
+				if (!mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580) {
+					g.drawImage(uiButton0, 270, 450, 160, 160, null);
+					foundSomething = true;
+				} else if (mouseDown && mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580) {
+					g.drawImage(uiButton1, 270, 450, 160, 160, null);
+					foundSomething = true;
+
+				} else {
+					g.drawImage(uiButton1, 270, 450, 160, 160, null);
+				}
+				if (!MagnifyingGlassActive) {
+					g.drawImage(magnifying_glass, 270, 450, 160, 160, null);
+				}
+
+				if (!mouseDown && mouseX > 470 && mouseY > 450 && mouseX < 630 && mouseY < 580) {
+					g.drawImage(uiButton0, 470, 450, 160, 160, null);
+					foundSomething = true;
+				} else {
+					g.drawImage(uiButton1, 470, 450, 160, 160, null);
+				}
+				if ((!(mouseX > 470 && mouseY > 450 && mouseX < 630 && mouseY < 580)
+						&& !(mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580))) {
+					foundSomething = false;
+				}
+				if (!pinCollected && currentScene.equals("Atrium")) {
+					g.drawImage(pin, 0, -75, WIDTH, HEIGHT, null);
+				}
+
 			}
-			if ((!(mouseX > 470 && mouseY > 450 && mouseX < 630 && mouseY < 580)
-					&& !(mouseX > 270 && mouseY > 450 && mouseX < 430 && mouseY < 580))) {
-				foundSomething = false;
-			}
-			if (!pinCollected && currentScene.equals("Atrium")) {
-				g.drawImage(pin, 0, -75, WIDTH, HEIGHT, null);
-			}
-			
-		}
-		if (!currentScene.equals("blank") && !inMenu
+			if (!currentScene.equals("blank") && !inMenu
 //				&& !debugMode
-		) {
-			g.setColor(Color.WHITE);
-			g.drawString("Location:", 653, 523);
-			g.setFont(TimesNewHamsterPro);
-			g.drawString(currentScene, 653, 553);
-			g.setFont(TimesNewHamster);
-			if (currentKeyColour.equals("pink")) {
-				g.drawImage(key_pink, 470, 450, 160, 160, null);
-			}
-			if (currentKeyColour.equals("orange")) {
-				g.drawImage(key_orange, 470, 450, 160, 160, null);
-			}
-			if (currentKeyColour.equals("green")) {
-				g.drawImage(key_green, 470, 450, 160, 160, null);
-			}
+			) {
+				g.setColor(Color.WHITE);
+				g.drawString("Location:", 653, 523);
+				g.setFont(TimesNewHamsterPro);
+				g.drawString(currentScene, 653, 553);
+				g.setFont(TimesNewHamster);
+				if (!cursorType.equals("held_key")) {
+					if (currentKeyColour.equals("pink")) {
+						g.drawImage(key_pink, 470, 450, 160, 160, null);
+					}
+					if (currentKeyColour.equals("orange")) {
+						g.drawImage(key_orange, 470, 450, 160, 160, null);
+					}
+					if (currentKeyColour.equals("brass")) {
+						g.drawImage(key_cursor, 470, 450, 160, 160, null);
+					}
+					if (currentKeyColour.equals("green")) {
+						g.drawImage(key_green, 470, 450, 160, 160, null);
+					}
+				}
 //			if (!currentKeyColour.equals("spoink")) {
 //				switch (currentKeyColour) {
 //				case "green":
@@ -1070,6 +1138,7 @@ public class GameWindow extends JFrame {
 //
 //				}
 //			}
+			}
 		}
 	}
 
