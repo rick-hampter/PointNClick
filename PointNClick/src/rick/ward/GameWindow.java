@@ -575,7 +575,7 @@ public class GameWindow extends JFrame {
 			} else {
 				LoadButtonHover = false;
 			}
-
+//
 		} else {
 
 			if (!PaintingMoved && currentScene.equals("Painting Room")
