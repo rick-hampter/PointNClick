@@ -12,8 +12,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.Random;
 
 public class GameWindow extends JFrame {
@@ -150,54 +157,91 @@ public class GameWindow extends JFrame {
 	// UNTIL THIS POINT
 	// =================
 
-	private boolean mouseDown = false;
+	/*
+	 * Method Name: writeOut Author: Kyle McKay Creation Date; Nov 15 2023 Modified
+	 * Date: Nov 15 2023 Description: Creates a file of the integer array
+	 * 
+	 * @Parameters: A integer array and the file name as a string.
+	 * 
+	 * @Return Value: None its a procedure Data Type: integer ARRAY Dependencies:
+	 * n/a Throws/Exceptions: File IO exceptions
+	 */
+	public static void writeOut(String filename, String[] Array) {
+		try {
+			PrintWriter outputfile = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 
-	private boolean inMenu = true;
-	private boolean PlayButtonHover = false;
-	private boolean LoadButtonHover = false;
+			for (int i = 0; i < Array.length; i++) {
+				outputfile.println(Array[i]);
+			}
 
-	private String cursorType = "menu";
-	private String currentKeyColour = "spoink";
-	private boolean foundSomething = false;
-	private boolean areTheLightsOn = false;
-	private boolean PaintingMoved = false;
+			outputfile.close();
+
+		} catch (Exception e) {
+			System.out.println("E-RR0R: " + e.toString());
+		}
+
+	}
+
+	private boolean mouseDown = false; // updated to true upon mouse beginning to be pressed and false when unpressed.
+										// works with left, middle and right click and afaik extra buttons on gaming
+										// mice.
+
+	private boolean inMenu = true; // used to indicate if certain ui elements should be functional or not. since,
+									// yknow, they shouldnt work in the menu (or be drawn)
+	private boolean PlayButtonHover = false; // used to indicate if the button is gray
+	private boolean LoadButtonHover = false;// used to indicate if the button is gray
+
+	private boolean didThePlayerJustPressS = false; // used to know if the player has pressed S to enter the save
+													// selector
+
+	private String cursorType = "menu"; // the player's cursortype. can be a key, the black blob in the menu, the
+										// magnifying glass, or the normal cursor
+	private String currentKeyColour = "spoink"; // SPOINK IS A VALUE USED TO INDICATE THERE IS NO KEY IN THE PLAYERS
+												// INVENTORY
+	private boolean foundSomething = false; // used for the mouse cursor having a white highlight when hovering over the
+											// magnifying glass icon!
+	private boolean PaintingMoved = false; // the painting in the room with the light switch!!!
 
 	private boolean purpleKeyCollected = false;
-	private boolean orangeKeyCollected = false;
+	private boolean orangeKeyCollected = false; // bunch o' gamestate variables to ensure there arent infinite places to
+												// get keys on the map LOL
 	private boolean greenKeyCollected = false;
-	public String gameName;
+	public String gameName; // filled with a random funny name on Setup()
 
 	private boolean debugMode = false; // change to false before submitting
+	// ^^^ gives the player cheats if enabled with I
 
-	private int GameTimerWhenButtonsAppear = 5;
-	private boolean DrawTheButtons = false;
+	private int GameTimerWhenButtonsAppear = 5; // my favourite coding convention: magic numbers
+	private boolean DrawTheButtons = false; // used for cinematic delay on the menu
 
-	private int GameTimerWhenPreambleAppears = 9;
-	private boolean DrawThePreamble = false;
+	private int GameTimerWhenPreambleAppears = 9; // my favourite coding convention: magic numbers
+	private boolean DrawThePreamble = false; // used for cinematic delay on the menu
 
-	private int GameTimerWhenSignatureAppears = 12;
-	private boolean DrawTheSignature = false;
+	private int GameTimerWhenSignatureAppears = 12; // my favourite coding convention: magic numbers
+	private boolean DrawTheSignature = false; // used for cinematic delay on the menu
 
-	private boolean pinCollected = false;
+	private boolean pinCollected = false; // this is a misnomer. it represents the key stuck into the globe in the
+											// atrium
 	private boolean anyDoorKeyIsBeingHeld = false;
-	private boolean frontDoorKeyCollected = false;
-	private boolean doorBellIsPressed = false;
-	private boolean rockIsSearched = false;
-	private boolean frontDoorOpen = false;
-	private int numLocksRemaining = 3;
-	private boolean theBasementDoorIsOpenYouCanCompleteTheGame = false;
+	private boolean frontDoorKeyCollected = false; // self-explanatory
+	private boolean doorBellIsPressed = false; // used for the dark gray colour the doorbell has when rung
+	private boolean rockIsSearched = false; // did they move the rock to find the key yet?
+	private boolean frontDoorOpen = false; // irelevant after the player enters the house.
+	private int numLocksRemaining = 3; // how many locks does the player have left to find the keys for?
+	private boolean theBasementDoorIsOpenYouCanCompleteTheGame = false; // i love longly-named variables
 
-	private boolean areTheLightsOnInThePaintingRoom = false;
+	private boolean areTheLightsOnInThePaintingRoom = false; // one of the so-called gamestate variables.
 
-	private Font TimesNewHamster = new Font("Dialog", Font.BOLD, 10);
-	private Font TimesNewHamsterPro = new Font("Dialog", Font.BOLD, 15);
+	private Font TimesNewHamster = new Font("Dialog", Font.BOLD, 10); // A small FONT
+	private Font TimesNewHamsterPro = new Font("Dialog", Font.BOLD, 15); // a BIG font
 
-	private int TimerAsOfLastClick = 0;
-	private int TimerAsOfEffect = 0;
-	private int TimerAsOfAmbience = 0;
+	private int TimerAsOfLastClick = 0; // used to prevent clickable objects from activating every frame.
+	private int TimerAsOfEffect = 0; // used to make sure lightning does not happen too close together
+	private int TimerAsOfAmbience = 0; // unused, but i am afraid to remove it.
 
-	private String tooltip = "This is the address.";
+	private String tooltip = "This is the address."; // displayed in the bottom left corner of the screen. adds humour
 
+	// ALL SOUNDS
 	private static File knockSFX = new File("knock.wav");
 	private static File doorSFX = new File("door.wav");
 	private static File doorbellSFX = new File("doorbell.wav");
@@ -214,16 +258,20 @@ public class GameWindow extends JFrame {
 	private static File musicAMB = new File("finish_game.wav");
 	private static File jazzAMB = new File("Kevin Macleod - Vibing Over Venus.wav");
 
-	private static double LatestRNG = 0;
+	private static double LatestRNG = 0; // used for any RNG element in the game. unfortunately, it is only used for the
+											// lightning.
 
-	private static int metroGnome = 0;
+	private static int metroGnome = 0; // udpated every half-second and loops when at 200. used to time animations.
 
-	private static String currentScene = "menu";
+	private static String currentScene = "menu"; // what is the current "room" that the player is in. HEAVILY important.
+													// used for drawing and updating.
 
-	private static boolean rainStarted = false;
+	private static boolean rainStarted = false; // is it raining? basically, is the cinematic delay over
 
 	private boolean MagnifyingGlassActive = false;
 	private boolean MagnifyingGlassHover = false;
+
+	private int lastInputtedSaveNumber = -1; // used as a layer of nuance in the file saver
 
 	private BufferedImage bgImage;
 	private BufferedImage uiButton0;
@@ -241,6 +289,9 @@ public class GameWindow extends JFrame {
 	private BufferedImage overlay_doorbell;
 
 	private BufferedImage menu;
+
+	private boolean menu_LoadSavePressed = false; // did the player just press the load save button????
+
 	private BufferedImage room1;
 	private BufferedImage room1_lightning;
 	private BufferedImage room2;
@@ -283,12 +334,52 @@ public class GameWindow extends JFrame {
 	private BufferedImage key_orange;
 	private BufferedImage key_green;
 
+	private String[] SaveArray = new String[10]; // used as a temp when saving a gamestate.
+	private String[] SaveArrayIn = new String[10]; // used as a temp when loading a gamestate
+
+	/*
+	 * Method Name: readIn Author: Kyle McKay Creation Date; Nov 15 2023 Modified
+	 * Date: Nov 15 2023 Description: Reads line by line the integers in a file
+	 * places in an array
+	 * 
+	 * @Parameters: A integer array, and file name as a string
+	 * 
+	 * @Return Value: Returns the filled in array Data Type: integer ARRAY
+	 * Dependencies: n/a Throws/Exceptions: File IO exceptions
+	 */
+	public static String[] readIn(String filename, String[] Array) {
+		String dataItem;
+		try {
+			BufferedReader FileInputPointer = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
+			int i = 0; // index of the array
+			while (FileInputPointer.ready() == true) {
+				dataItem = FileInputPointer.readLine();
+//				System.out.println("Yo, I read in this, yo:" + dataItem);
+				Array[i] = dataItem;
+				i++;
+			}
+			FileInputPointer.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("YOU'RE TRYING TO PASS OFF SOME GARBAGE!");
+		} catch (IOException e) {
+			System.out.println("E-RR0R" + e.toString());
+		}
+		return Array;
+	}
+
 	private BufferedImage cutout;
 	private BufferedImage painting;
 
-	private static int cinematicDelay = 999;
-	private static boolean cinematicDelayOver = false;
+	private static int cinematicDelay = 999; // in leaveMenu, this is the number of halfseconds that the screen will be
+												// black upon entering a new game.
+	private static boolean cinematicDelayOver = false; // used to make sure that on the metroGnome tick when they are
+														// initally different, the things that happen at the end of the
+														// delay do not loop infinitively.
 
+	/**
+	 * Author: Richard Does: It is a collection of game variables set once the
+	 * player leaves the menu.
+	 */
 	private void leaveMenu() {
 		if (metroGnome > 190) {
 			cinematicDelay = metroGnome - 190;
@@ -302,15 +393,76 @@ public class GameWindow extends JFrame {
 		playWav(omenSFX);
 	}
 
+	/**
+	 * Author: R. W. Created: 16 Jun 2026 Does: it's a modification of LeaveMenu
+	 * that removes the cinematic! Type: Void
+	 */
+	private void loadFromMenu() {
+		if (metroGnome > 190) {
+			cinematicDelay = metroGnome - 190;
+		} else {
+			cinematicDelay = metroGnome + 10;
+		}
+		cursorType = "clicker";
+		inMenu = false;
+		cinematicDelayOver = true;
+		stopJazz();
+		playWav(omenSFX);
+	}
+
+	/**
+	 * Author: Someone named Rick Created: 16 Jun 2026 DOES: IT SETS AN ARRAY TO ALL
+	 * MAJOR GAME VARIABlES!!!
+	 * 
+	 * @param String[]
+	 */
+	private void GenSaveArray(String[] Hamster) {
+		Hamster[0] = Boolean.toString(PaintingMoved);
+		Hamster[1] = currentScene;
+		Hamster[2] = Boolean.toString(theBasementDoorIsOpenYouCanCompleteTheGame);
+		Hamster[3] = Boolean.toString(pinCollected);
+		Hamster[4] = Integer.toString(numLocksRemaining);
+
+		Hamster[5] = Boolean.toString(greenKeyCollected);
+		Hamster[6] = Boolean.toString(purpleKeyCollected);
+		Hamster[7] = Boolean.toString(orangeKeyCollected);
+
+		Hamster[8] = currentKeyColour;
+		Hamster[9] = Boolean.toString(areTheLightsOnInThePaintingRoom);
+	}
+
+	/**
+	 * Author: Someone named Rick DOES: IT SETS ALL MAJOR GAME VARIABLES TO WHAT WAS
+	 * READ IN FROM THE ARRAY THAT THE USER CHOSE!!! Created: 16 Jun 2026
+	 * 
+	 * @param String[]
+	 */
+	private void ReverseGenSaveArray(String[] Hamster) {
+		PaintingMoved = Boolean.parseBoolean(Hamster[0]);
+		currentScene = Hamster[1];
+		theBasementDoorIsOpenYouCanCompleteTheGame = Boolean.parseBoolean(Hamster[2]);
+		pinCollected = Boolean.parseBoolean(Hamster[3]);
+		numLocksRemaining = Integer.parseInt(Hamster[4]);
+
+		greenKeyCollected = Boolean.parseBoolean(Hamster[5]);
+		purpleKeyCollected = Boolean.parseBoolean(Hamster[6]);
+		orangeKeyCollected = Boolean.parseBoolean(Hamster[7]);
+
+		currentKeyColour = Hamster[8];
+		areTheLightsOnInThePaintingRoom = Boolean.parseBoolean(Hamster[9]);
+	}
+
 	// -------------------------------------------------------------------------
 	// Config
 	// -------------------------------------------------------------------------
-	public static final int WIDTH = 800;
-	public static final int HEIGHT = 600;
-	private static final int TARGET_FPS = 60;
+	public static final int WIDTH = 800; // width of the gameWindow. dont change it.
+	public static final int HEIGHT = 600; // height of the gameWindow. dont change it.
+	private static final int TARGET_FPS = 60; // fps of the gameWindow. dont change it.
 
-	private int mouseX = 0;
-	private int mouseY = 0;
+	private int mouseX = 0; // updated in Update() and is the current X position of the mouse relative to
+							// the top left corner of the window
+	private int mouseY = 0; // updated in Update() and is the current Y position of the mouse relative to
+							// the top left corner of the window
 
 	private final Canvas canvas = new Canvas() {
 		@Override
@@ -327,17 +479,65 @@ public class GameWindow extends JFrame {
 			public void keyPressed(KeyEvent e) {
 				int key = e.getKeyCode();
 				if (key == KeyEvent.VK_1) {
-					currentScene = "A dark void";
-				} else if (key == KeyEvent.VK_2) {
-					currentScene = "Painting Room";
+					if (menu_LoadSavePressed) {
+						menu_LoadSavePressed = false;
+						readIn("savefiles/1.txt", SaveArrayIn);
+						ReverseGenSaveArray(SaveArrayIn);
+						loadFromMenu();
+					}
+					if (didThePlayerJustPressS && !inMenu) {
+						didThePlayerJustPressS = false;
+						lastInputtedSaveNumber = 1;
+						String SaveFileName = "savefiles/" + Integer.toString(lastInputtedSaveNumber) + ".txt";
+						GenSaveArray(SaveArray);
+						writeOut(SaveFileName, SaveArray);
+					}
+				} else if (key == KeyEvent.VK_S) {
+					didThePlayerJustPressS = true;
+				}
+				if (key == KeyEvent.VK_2) {
+					if (menu_LoadSavePressed) {
+						menu_LoadSavePressed = false;
+						readIn("savefiles/2.txt", SaveArrayIn);
+						ReverseGenSaveArray(SaveArrayIn);
+						loadFromMenu();
+					}
+					if (didThePlayerJustPressS && !inMenu) {
+						didThePlayerJustPressS = false;
+						lastInputtedSaveNumber = 2;
+						String SaveFileName = "savefiles/" + Integer.toString(lastInputtedSaveNumber) + ".txt";
+						GenSaveArray(SaveArray);
+						writeOut(SaveFileName, SaveArray);
+					}
 				} else if (key == KeyEvent.VK_3) {
-					currentScene = "Atrium";
+					if (menu_LoadSavePressed) {
+						menu_LoadSavePressed = false;
+						readIn("savefiles/3.txt", SaveArrayIn);
+						ReverseGenSaveArray(SaveArrayIn);
+						loadFromMenu();
+					}
+					if (didThePlayerJustPressS && !inMenu) {
+						didThePlayerJustPressS = false;
+						lastInputtedSaveNumber = 3;
+						String SaveFileName = "savefiles/" + Integer.toString(lastInputtedSaveNumber) + ".txt";
+						GenSaveArray(SaveArray);
+						writeOut(SaveFileName, SaveArray);
+					} else {
+
+					}
 				} else if (key == KeyEvent.VK_4) {
 					currentScene = "Main Hall";
 				} else if (key == KeyEvent.VK_5) {
 					currentScene = "Courtyard";
 				} else if (key == KeyEvent.VK_6) {
 					currentScene = "Foyer";
+				} else if (key == KeyEvent.VK_7) {
+					currentScene = "Atrium";
+				} else if (key == KeyEvent.VK_8) {
+					currentScene = "A dark void";
+				} else if (key == KeyEvent.VK_9) {
+					currentScene = "Painting Room";
+
 				} else if (key == KeyEvent.VK_M) {
 					currentScene = "menu";
 					inMenu = true;
@@ -424,6 +624,14 @@ public class GameWindow extends JFrame {
 		}).start();
 	}
 
+	/**
+	 * Author: R. A. Ward Does: Sets up the gameWindow thread for use in useful
+	 * scenarios. Createdated: 16-Jun-2026
+	 * 
+	 * @throws IOException
+	 * @throws LineUnavailableException
+	 * @throws UnsupportedAudioFileException
+	 */
 	private void run() throws IOException, LineUnavailableException, UnsupportedAudioFileException {
 		setVisible(true);
 		canvas.createBufferStrategy(2);
@@ -459,6 +667,10 @@ public class GameWindow extends JFrame {
 		}
 	}
 
+	/**
+	 * Author: R. A. Ward Does: Sets up the gameWindow's variables, and starts music
+	 * for use in party scenarios. Createdated: 16-Jun-2026
+	 */
 	private void setup() throws IOException {
 		String[] Titles = { "Proffesor", "Doctor", "Inspector", "Detective", "Mr.", "Grand Inquisitor", "Dr.", "Sir",
 				"Lord" };
@@ -538,9 +750,18 @@ public class GameWindow extends JFrame {
 		cutout = ImageIO.read(new File("cutout.png"));
 	}
 
-	private boolean thundered = false;
-	private int SpecialDoorbellDelay = 0;
+	private boolean thundered = false; // used to make sure that the thunder sound doesn't start every frame while the
+										// random thunder occurencing is happening
+	private int SpecialDoorbellDelay = 0; // used to give the doorbell an EXTRA long click delay. it does not use
+											// TimerAsOfLastClick
 
+	/**
+	 * Author: R. A. Ward Does: Updates the Game Logic. called continuosly while the
+	 * game is being run. VERY important. Createdated: 16-Jun-2026
+	 * 
+	 * @throws LineUnavailableException
+	 * @throws UnsupportedAudioFileException
+	 */
 	private void update() throws LineUnavailableException, UnsupportedAudioFileException {
 		LatestRNG = Math.random();
 
@@ -572,6 +793,9 @@ public class GameWindow extends JFrame {
 
 			if (mouseX > 467 && mouseY > 358 && mouseX < 740 && mouseY < 496) {
 				LoadButtonHover = true;
+				if (mouseDown) {
+					menu_LoadSavePressed = true;
+				}
 			} else {
 				LoadButtonHover = false;
 			}
@@ -586,7 +810,8 @@ public class GameWindow extends JFrame {
 				playWav(rockSFX);
 				tooltip = "Oldest trick in the book!";
 			}
-			if (currentKeyColour.equals("spoink") &&  PaintingMoved && currentScene.equals("Painting Room")
+			if (!greenKeyCollected && currentKeyColour.equals("spoink") && PaintingMoved
+					&& currentScene.equals("Painting Room")
 					&& (mouseX > 447 && mouseY > 115 && mouseX < 500 && mouseY < 179) && mouseDown
 					&& cursorType.equals("clicker") && (TimerAsOfLastClick + 1 < metroGnome)) {
 				currentKeyColour = "green";
@@ -849,8 +1074,9 @@ public class GameWindow extends JFrame {
 			if (currentScene.equals("Atrium") && mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217
 					&& mouseDown && MagnifyingGlassActive) {
 				tooltip = "It's a purple key stabbed into a globe.";
-			} else if (currentKeyColour.equals("spoink") && currentScene.equals("Atrium") && mouseX > 500
-					&& mouseY > 180 && mouseX < 530 && mouseY < 217 && mouseDown && !MagnifyingGlassActive) {
+			} else if (!pinCollected && currentKeyColour.equals("spoink") && currentScene.equals("Atrium")
+					&& mouseX > 500 && mouseY > 180 && mouseX < 530 && mouseY < 217 && mouseDown
+					&& !MagnifyingGlassActive) {
 				pinCollected = true;
 //				cursorType = "held_key";
 				currentKeyColour = "pink";
@@ -870,6 +1096,12 @@ public class GameWindow extends JFrame {
 		}
 	}
 
+	/**
+	 * Author: R. A. Ward Does: DRAWS up the gameWindow. called repeatedly,
+	 * obviously. Createdated: 16-Jun-2026
+	 * 
+	 * @throws Nothing!!!
+	 */
 	private void draw(Graphics2D g) {
 		g.setFont(TimesNewHamster);
 		g.setColor(Color.BLACK);
@@ -958,6 +1190,13 @@ public class GameWindow extends JFrame {
 					g.drawImage(loadButton0, 0, -50, WIDTH, HEIGHT, null);
 				}
 			}
+
+			g.setFont(TimesNewHamsterPro);
+			g.setColor(Color.yellow);
+			g.fillRect(10, 555, 540, 35);
+			g.setColor(Color.blue);
+			g.drawString("To load, press Load Save and use save slots 1, 2, or 3 on your keyboard.", 10, 566);
+			g.drawString("To save, press S in-game and use save slots 1, 2, or 3 on your keyboard.", 10, 580);
 
 			break;
 		case "Painting Room":
@@ -1142,6 +1381,10 @@ public class GameWindow extends JFrame {
 		}
 	}
 
+	/**
+	 * Author: R. A. Ward Does: Just draws the cursor. more efficient to use another
+	 * mmethord for this. Createdated: 16-Jun-2026
+	 */
 	private void drawCursor(Graphics2D g) {
 
 		int hotspotX = 0;
@@ -1167,11 +1410,7 @@ public class GameWindow extends JFrame {
 
 		else if (cursorType.equals("held_key")) {
 			g.drawImage(key_cursor, mouseX - hotspotX, mouseY - hotspotY, 64, 64, null);
-			if (frontDoorOpen && !debugMode) {
-				g.setFont(TimesNewHamsterPro);
-				g.setColor(Color.red);
-				g.drawString("I, Rick, am aware that this key is the wrong colour.", mouseX, mouseY);
-			}
+
 		} else if (cursorType.equals("menu")) {
 			g.drawImage(cursor3, mouseX - hotspotX, mouseY - hotspotY, 64, 64, null);
 		}
